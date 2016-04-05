@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="content">
+	<typeAlias alias="ReqContentInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.floor.content.bean.req.ReqContentInfo" />
+	<typeAlias alias="RspContentInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.floor.content.bean.rsp.RspContentInfo" />
+	<!-- 楼层模块信息 -->
+	<resultMap id="RspContentInfoMap" class="RspContentInfo">
+		<result property="floorKey" column="floorKey"></result>
+		<result property="imgURL" column="imgURL"></result>
+		<result property="linkURL" column="linkURL"></result>
+		<result property="flagType" column="flagType"></result>
+		<result property="indexNum" column="indexNum"></result>
+		<result property="objKey" column="objKey"></result>
+	</resultMap>
+	
+	<!-- 查询楼层模块信息 -->
+	<select id="queryContentInfo"  parameterClass="ReqContentInfo"  resultMap="RspContentInfoMap">
+		select t.	floorkey  as floorKey,
+				  t.imgurl  as imgURL,
+				  t.linkurl  as linkURL,
+				  t.flagtype  as flagType,
+				  t.indexnum as indexNum,
+				  t.OBJ_KEY as objKey
+		from  BASE_APPHOME_FLOOR_CONTENT  t
+		where t.	floorkey =#floorKey#
+		and t.province = #province#
+		and t.city = #city#
+		order by t.indexnum asc
+	</select>
+
+</sqlMap>

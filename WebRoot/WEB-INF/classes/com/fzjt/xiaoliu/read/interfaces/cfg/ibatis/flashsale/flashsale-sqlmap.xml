@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="flashsale">
+	<typeAlias alias="reqFlashSaleInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.flashsale.bean.info.req.ReqFlashSaleInfo" />
+	<typeAlias alias="rspFlashSaleInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.flashsale.bean.info.rsp.RspFlashSaleInfo" />
+	<typeAlias alias="rspFSGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.flashsale.bean.list.rsp.RspFSGoodsInfo" />
+	<typeAlias alias="reqFSGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.flashsale.bean.list.req.ReqFSGoodsInfo" />
+	
+	<!-- 限时秒杀活动信息 -->
+	<resultMap id="rspFlashSaleInfoMap" class="rspFlashSaleInfo">
+		<result property="salesKey" column="salesKey"></result>
+		<result property="salesName" column="salesName"></result>
+		<result property="salesDesc" column="salesDesc"></result>
+		<result property="salesPic" column="salesPic"></result>
+		<result property="salesDate" column="salesDate"></result>
+		<result property="beginTime" column="beginTime"></result>
+		<result property="endTime" column="endTime"></result>
+		<result property="sysTime" column="sysTime"></result>
+	</resultMap>
+	
+	<!-- 限时秒杀商品信息 -->
+	<resultMap id="rspFSGoodsInfoMap" class="rspFSGoodsInfo">
+		<result property="salesKey" column="salesKey"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="skuKey" column="skuKey"></result>
+		<result property="skuName" column="skuName"></result>
+		<result property="skuPic" column="skuPic"></result>
+		<result property="skuCount" column="skuCount"></result>
+		<result property="skuSpec" column="skuSpec"></result>
+		<result property="skuPrice" column="skuPrice"></result>
+		<result property="isSale" column="isSale"></result>
+	</resultMap>
+		
+	<!-- 查询限时秒杀活动信息 -->
+	<select id="queryFlashSaleList" parameterClass="reqFlashSaleInfo" resultMap="rspFlashSaleInfoMap">
+			select t.SALES_KEY 			as salesKey,
+						t.SALES_NAME		as salesName,
+						t.SALES_DESC		as salesDesc,
+						t.SALES_PIC			as salesPic,
+						t.SALES_DATE		as salesDate,
+						t.BEGIN_TIME		as beginTime,
+						t.END_TIME			as endTime,
+						sysdate as sysTime
+				from BASE_TIME_LIMITED_SALES_INFO t
+				where 1=1
+				 <![CDATA[
+				and trunc(t.BEGIN_TIME) <= trunc(sysdate)
+				and trunc(t.END_TIME) >= trunc(sysdate)
+				]]>
+				and t.PROVINCE = #province#
+				and t.CITY = #city#
+				and t.STATUS != '2'
+				and t.ON_SALE = '0'
+				order by t.begin_time asc
+	</select>
+	
+	<!-- 查询特定数量限时秒杀商品信息 -->
+	<select id="queryFSGoodsList" parameterClass="reqFSGoodsInfo"	resultMap="rspFSGoodsInfoMap">
+		select 	salesKey,
+					goodsKey,
+					skuKey,
+					skuName,
+					skuPic,
+					skuCount,
+					skuSpec,
+					skuPrice,
+					isSale
+		from(
+					select t.SALES_KEY 	as salesKey,
+							t.GOODS_KEY 	as goodsKey,
+							t.SKU_KEY		as skuKey,
+							t.SKU_NAME	as skuName,
+							t.SKU_PIC			as skuPic,
+							t.SKU_COUNT	as skuCount,
+							t.SKU_SPECIFICATION as skuSpec,
+							t.IS_SALE			as isSale,
+							trim(to_char(p.CURRENT_PRICE/100,'999999999999990.99'))	as skuPrice,
+							row_number() over(order by	t.ORDER_FLAG asc) rn
+						from BASE_TIME_LIMITED_SALES_SKU t, FZJT_TOTAL_PRICE_INFO@PAYDBL p
+						where 1 = 1
+						and t.STATUS = '0'
+						and t.ON_SALE = '0'
+						and p.STATUS = '0'
+						and t.GOODS_KEY = p.GOODS_KEY
+						and t.SKU_KEY = p.SKUKEY
+						and t.SALES_KEY = p.PRICE_MARK_KEY
+						and t.SALES_KEY = #salesKey#
+				) 
+			where rn  between #fromNum# and #toNum#
+	</select>
+	
+	<!-- 查询特定数量限时秒杀商品信息 -->
+	<select id="queryFSGoodsListCount" parameterClass="java.lang.String"	resultClass="java.lang.String">
+			select count(1)
+			 from BASE_TIME_LIMITED_SALES_SKU t, FZJT_TOTAL_PRICE_INFO@PAYDBL p
+						where 1 = 1
+						and t.STATUS = '0'
+						and t.ON_SALE = '0'
+						and p.STATUS = '0'
+						and t.GOODS_KEY = p.GOODS_KEY
+						and t.SKU_KEY = p.SKUKEY
+						and t.SALES_KEY = p.PRICE_MARK_KEY
+						and t.SALES_KEY = #salesKey#
+	</select>
+
+	<!-- 查询活动商品销量 -->
+	<select id="queryFSGoodsLeft" parameterClass="rspFSGoodsInfo" resultClass="java.lang.String">
+		select F_FLASHSALE_LEFT_NUM(#skuKey#, #salesKey#) from dual
+	</select>
+</sqlMap>

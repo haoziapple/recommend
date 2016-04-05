@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="check">
+
+	<!-- 返回 订单详情 -->
+	<typeAlias alias="orderInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.check.bean.OrderInfo" />
+	<!-- 查询订单商品集合状态（区域配送，限购数量，库存量） -->
+	<typeAlias alias="goodsDistInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.check.bean.GoodsDistInfo" />
+	<!-- 校验订单 的 商品 X日限购 -->
+	<typeAlias alias="goodsLimitInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.check.bean.GoodsLimitInfo" />
+	<typeAlias alias="reqCheckGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.check.bean.goods.req.ReqCheckGoodsInfo" />
+	
+	<!-- 商品订单信息 -->
+	<resultMap id="orderInfoMap" class="orderInfo">
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="goodsName" column="goodsName"></result>
+		<result property="purchaseNum" column="purchaseNum"></result>
+		<result property="skuKey" column="skuKey"></result>
+		<result property="userKey" column="userKey"></result>
+	</resultMap>
+	
+	<!-- 商品X日限购信息 -->
+	<resultMap id="goodsLimitList" class="goodsLimitInfo">
+		<result property="limitDate" column="limitDate"></result>
+		<result property="limitCount" column="limitCount"></result>
+	</resultMap>
+	
+	<!-- 查询订单信息 -->
+	<select id="queryOrderInfoList" parameterClass="java.lang.String"
+		resultMap="orderInfoMap">
+		select
+		t1.GOODS_KEY goodsKey,
+		t1.GOODS_NAME goodsName,
+		t1.PURCHASE_NUM purchaseNum,
+		t1.SKUKEY skuKey,
+		t.USER_KEY userKey
+		from FZJT_ORDER_INFO@PAYDBL t, FZJT_ORDER_GOODS_INFO@PAYDBL t1
+		where t.ORDER_CODE = t1.ORDER_CODE
+		and t.ORDER_CODE = #orderInfo#
+	</select>
+	
+	<!-- 查询商品限购数量 -->
+	<select id="queryGoodsLimitNum" parameterClass="goodsDistInfo" resultClass="java.lang.String">
+		select NVL(t.limit_count, 0) as limitCount
+		  from base_shop_goods_info t
+		 where t.goods_key = #goodsKey#
+	</select>
+	
+	<!-- 查询此sku库存 -->
+	<select id="queryGoodsTrueNum" parameterClass="goodsDistInfo" resultClass="java.lang.String">
+		select f_shop_goods_skustock(#skuKey#) as trueNum from
+		dual
+	</select>
+	
+	<!-- 查询商品状态 -->
+	<select id="queryGoodsStatus" parameterClass="goodsDistInfo" resultClass="java.lang.String">
+		select t.status status
+		  from base_shop_goods_info t
+		 where t.goods_key = #goodsKey#
+	</select>
+	
+	<!-- 查询商品上下架状态 -->
+	<select id="queryGoodsOnSale" parameterClass="goodsDistInfo"	resultClass="java.lang.String">
+		select t.on_sale onSale
+		  from base_shop_goods_info t
+		 where t.goods_key = #goodsKey#
+	</select>
+	
+	<!-- 商品限购信息（限购数量，限购天数） -->
+	<select id="queryGoodsLimitInfo" parameterClass="goodsLimitInfo"	resultMap="goodsLimitList">
+		select	t.limit_count limitcount,
+				t.limit_date limitDate
+		from	BASE_SHOP_GOODS_INFO t
+		where	t.goods_key = #goodsKey#
+	</select>
+
+	<!-- 查询该用户 购买商品的 X天 购买数量 -->
+	<select id="queryBuyGoodsCount" parameterClass="goodsLimitInfo"
+		resultClass="java.lang.Integer">
+		select
+		nvl(sum(t.purchase_num),0)
+		from
+		FZJT_ORDER_GOODS_INFO@PAYDBL t
+		where exists
+		(
+		select s.order_code
+		from FZJT_ORDER_INFO@PAYDBL s
+		where
+		t.order_code = s.order_code
+		and s.order_status !=4
+			<![CDATA[
+			and s.ADDTIME >= TRUNC(sysdate
+			]]>
+		<isNotEmpty prepend="-" property="limitDate">
+			#limitDate#
+		</isNotEmpty>
+		)
+		and s.user_key = #userKey#
+		)
+		and not exists
+		(
+		select b.sales_key
+		from base_time_limited_sales_info b
+		where t.price_mark_key = b.sales_key
+		)
+		and t.goods_key = #goodsKey#
+	</select>
+
+	<!-- 根据goodsKey查询商品名称 -->
+	<select id="queryGoodsName" parameterClass="java.lang.String"	resultClass="java.lang.String">
+		select	t.goods_name
+		from	BASE_SHOP_GOODS_INFO t
+		where	t.goods_key = #goodsKey#
+		and t.status  = '0'
+	</select>
+	
+	<!-- 查询购物车中已存在该商品的数量 -->
+	<select id="queryCartGoodsNum" parameterClass="reqCheckGoodsInfo"	resultClass="java.lang.Integer">
+		select	nvl(sum(t.NUM),0)
+		from	FZJT_CART_INFO@PAYDBL t
+		where	t.ACCOUNTNUM = #userKey#
+		and t.GOODSKEY = #goodsKey#
+	</select>
+	
+	<!-- 查询用户已购买商品数 -->
+	<select id="queryGoodsBuyNum" parameterClass="reqCheckGoodsInfo"	resultClass="java.lang.Integer">
+		select
+	    nvl(sum(t.purchase_num),0)
+	    from
+	    FZJT_ORDER_GOODS_INFO@PAYDBL t
+	    where
+	    t.order_code in
+	    (
+	    select
+	    t.order_code
+	    from
+	    FZJT_ORDER_INFO@PAYDBL t
+	    where  t.order_status !='4'
+			and  t.user_key = #userKey#
+			)
+		and
+		t.goods_key = #goodsKey#
+	</select>
+
+</sqlMap>

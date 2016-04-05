@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="goodsAffixs">
+
+	<typeAlias alias="RspAffixesInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.affixs.bean.sku.rsp.RspAffixesInfo" />
+	
+	<!-- 附件信息 -->
+	<resultMap id="RspGoodsAffixInfoMap" class="RspAffixesInfo">
+		<result property="affName" column="affName"></result>
+		<result property="affURL" column="affURL"></result>
+		<result property="affKey" column="affKey"></result>
+	</resultMap>
+	
+	<!-- 查询goodsKey附件信息 -->
+	<select id="queryGoodsAffixsByKey"  parameterClass="java.lang.String" resultMap="RspGoodsAffixInfoMap">
+		select  t.aff_name as affName,
+				   t.aff_key as affKey,
+			       t.aff_url    as affURL
+			  from BASE_SHOP_GOODS_AFFIX t
+			 where t.GOODS_KEY = #goodsKey#	
+			   and t.status ='0'
+			 order by t.ADD_TIME desc
+	</select>
+
+</sqlMap>

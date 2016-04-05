@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="floor">
+
+	<typeAlias alias="reqFloorInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.floor.info.req.ReqFloorInfo" />
+	<typeAlias alias="rspFloorInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.floor.info.rsp.FloorInfo" />
+	<typeAlias alias="priceInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.floor.info.rsp.PriceInfo" />
+		
+	<typeAlias alias="reqViewInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.floor.view.req.ReqViewInfo" />
+	<typeAlias alias="viewInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.floor.view.rsp.ViewInfo" />	
+		
+	<!-- 楼层展示商品、商家、活动信息 -->
+	<resultMap id="rspFloorInfoMap" class="rspFloorInfo">
+		<result property="floorKey" column="floorKey"></result>
+		<result property="objKey" column="objKey"></result>
+		<result property="objType" column="objType"></result>
+		<result property="objName" column="objName"></result>
+		<result property="imgUrl" column="imgUrl"></result>
+		<result property="linkUrl" column="linkUrl"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="isShow" column="isShow"></result>
+	</resultMap>
+	
+	<!-- 楼层展示商品价格 -->
+	<resultMap id="priceInfoMap" class="priceInfo">
+		<result property="priceOld" column="priceOld"></result>
+		<result property="priceNow" column="priceNow"></result>
+	</resultMap>
+	
+	<!-- 楼层展示信息 -->
+	<resultMap id="rspViewInfoMap" class="viewInfo">
+		<result property="floorKey" column="floorKey"></result>
+		<result property="floorName" column="floorName"></result>
+		<result property="floorLogo" column="floorLogo"></result>
+		<result property="temStyle" column="temStyle"></result>
+	</resultMap>
+	
+	
+	<!-- 查询楼层展示商品、商家、活动信息-->
+	<select id="queryFloorInfoList"  parameterClass="reqFloorInfo"  resultMap="rspFloorInfoMap">
+			select  t. FLOOR_KEY as floorKey,
+			        t.OBJ_KEY as objKey,
+			        t.OBJ_TYPE as objType,
+			        t.OBJ_NAME as objName,
+			        t.IMG_URL as imgUrl,
+			        t.LINK_URL as linkUrl,
+			        t.GOODS_KEY as goodsKey,
+			        t.IS_SHOW as isShow
+			    from BASE_PC_HOME_FLOOR_CONTENT t
+			    where 1 = 1
+			    and t.STATUS = '0'
+			    <isNotEmpty prepend=" AND " property="isShow">
+					  t.IS_SHOW = #isShow#
+				</isNotEmpty>
+			    and t.PROVINCE = #province#
+				and t.CITY = #city#
+			    and t.FLOOR_KEY = #floorKey#
+			    order by t.ORDER_FLAG asc
+	</select>
+	
+	<!-- 查询楼层展示商品价格 -->
+	<select id="queryGoodsPrice" parameterClass="rspFloorInfo"  resultMap="priceInfoMap">
+	select  trim(to_char(t.ORIGINAL_PRICE/100,'999999999999990.99'))	as priceOld,
+			trim(to_char(t.CURRENT_PRICE/100,'999999999999990.99'))	as priceNow
+	from FZJT_TOTAL_PRICE_INFO@PAYDBL t
+	where t.SKUKEY = #objKey#
+	and t.PRICE_MARK_KEY = #floorKey#
+	</select>
+	
+	<!-- 查询楼层展示信息-->
+	<select id="queryViewList"  parameterClass="reqViewInfo"  resultMap="rspViewInfoMap">
+		select  t.FLOOR_KEY as floorKey,
+				t.FLOOR_NAME as floorName,
+				t.FLOOR_LOGO as floorLogo,
+				s.TEM_STYLE as temStyle
+		from BASE_PC_HOME_FLOOR t, BASE_PC_MODULE_TEMPLATE s
+		where t.PROVINCE = #province#
+		and t.CITY = #city#
+		and t.STATUS = '0'
+		and t.TMP_KEY = s.TMP_KEY
+		and s.STATUS = '0'
+		order by t.ORDER_FLAG asc
+	</select>
+
+
+</sqlMap>

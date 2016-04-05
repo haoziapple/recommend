@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="shop">
+	<typeAlias alias="ReqShopInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.shop.bean.info.req.ReqShopInfo" />
+	<typeAlias alias="rspShopInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.shop.bean.info.rsp.RspShopInfo" />
+	
+	<!-- 商家信息-->
+	<resultMap id="rspShopInfoMap" class="rspShopInfo">
+		<result property="shopName" column="shopName"></result>
+		<result property="shopLogo" column="shopLogo"></result>
+		<result property="shopDesc" column="shopDesc"></result>
+		<result property="shopNature" column="shopNature"></result>
+		<result property="shopType" column="shopType"></result>
+		<result property="shopAddress" column="shopAddress"></result>
+		<result property="shopWebsite" column="shopWebsite"></result>
+		<result property="postalCode" column="postalCode"></result>
+		<result property="isJoin" column="isJoin"></result>
+		<result property="isChain" column="isChain"></result>
+		<result property="isSwiping" column="isSwiping"></result>
+		<result property="isPark" column="isPark"></result>
+		<result property="isWifi" column="isWifi"></result>
+		<result property="businessHours" column="businessHours"></result>
+		<result property="weiXin" column="weiXin"></result>
+		<result property="linkMan" column="linkMan"></result>
+		<result property="linkManTel" column="linkManTel"></result>
+		<result property="userKey" column="userKey"></result>
+		<result property="shopTel" column="shopTel"></result>
+		<result property="serviceTel" column="serviceTel"></result>
+	</resultMap>
+
+
+
+	<!-- 根据商家key查询商家信息-->
+	<select id="queryShopInfoByKey" parameterClass="java.lang.String" resultMap="rspShopInfoMap">
+		select  t.SHOP_NAME		as shopName,
+				t.SHOP_LOGO		as shopLogo,
+				t.SHOP_DESC		as shopDesc,
+				t.SHOP_NATURE	as shopNature,
+				t.SHOP_TYPE		as shopType,
+				t.SHOP_ADDRESS	as shopAddress,
+				t.SHOP_WEBSITE	as shopWebsite,
+				t.POSTALCODE	as postalCode,
+				t.IS_JOIN		as isJoin,
+				t.IS_CHAIN		as isChain,
+				t.IS_SWIPING	as isSwiping,
+				t.IS_PARK		as isPark,
+				t.IS_WIFI		as isWifi,
+				t.BUSINESS_HOURS as businessHours,
+				t.WEIXIN		as weiXin,
+				t.LINKMAN		as linkMan,
+				t.LINKMAN_TEL	as linkManTel,
+				t.USER_KEY		as userKey,
+				t.SHOP_TEL		as shopTel,
+				t.SERVICE_TEL	as serviceTel
+		from	BASE_SHOP_BASIC_INFO t
+		where	t.status = '0'
+		and		t.SHOP_KEY = #shopKey#
+	</select>
+	
+</sqlMap>

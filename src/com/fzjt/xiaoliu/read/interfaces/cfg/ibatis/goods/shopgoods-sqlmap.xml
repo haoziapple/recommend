@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="shopgoods">
+
+	<typeAlias alias="RspGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.list.rsp.RspGoodsInfo" />
+	<typeAlias alias="ReqGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.list.req.ReqGoodsInfo" />
+	<!-- 商品信息 -->
+	<resultMap id="RspGoodsInfoMap" class="RspGoodsInfo">
+		<result property="ID" column="ID"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="shopKey" column="shopKey"></result>
+		<result property="goodsName" column="goodsName"></result>
+		<result property="goodsSize" column="goodsSize"></result>
+		<result property="goodsType" column="goodsType"></result>
+		<result property="peisong" column="peisong"></result>
+		<result property="serveInfo" column="serveInfo"></result>
+		<result property="goodsPics" column="goodsPics"></result>
+		<result property="goodsKind" column="goodsKind"></result>
+		<result property="addTime" column="addTime"></result>
+		<result property="uppTime" column="uppTime"></result>
+		<result property="status" column="status"></result>
+		<result property="province" column="province"></result>
+		<result property="city" column="city"></result>
+		<result property="area" column="area"></result>
+		<result property="queryOpts" column="queryOpts"></result>
+		<result property="saleTitle" column="saleTitle"></result>
+		<result property="goodsCount" column="goodsCount"></result>
+		<result property="goodsCode" column="goodsCode"></result>
+		<result property="onSale" column="onSale"></result>
+		<result property="offTime" column="offTime"></result>
+		<result property="onTime" column="onTime"></result>
+		<result property="privilegeInfo" column="privilegeInfo"></result>
+		<result property="limitCount" column="limitCount"></result>
+		<result property="priceOld" column="priceOld"></result>
+		<result property="priceNow" column="priceNow"></result>
+		<result property="defaultSku" column="defaultSku"></result>
+		<result property="peisongType" column="peisongType"></result>
+		<result property="isInvoice" column="isInvoice"></result>
+		<result property="limitDate" column="limitDate"></result>
+		<result property="indexNum" column="rn" />
+	</resultMap>
+
+	<!-- 根据商家信息类别查询商品列表(根据价格排序) -->
+	<select id="queryShopGListByPrice" parameterClass="ReqGoodsInfo"		resultMap="RspGoodsInfoMap">
+		select 
+		ID,
+		goodsKey,
+		shopKey,
+		goodsName,
+		goodsType,
+		goodsSize,
+		peiSong,
+		serveInfo,
+		goodsPics,
+		goodsKind,
+		addTime,
+		uppTime,
+		status,
+		province,
+		city,
+		area,
+		queryOpts,
+		saleTitle,
+		goodsCount,
+		goodsCode,
+		onSale,
+		offTime,
+		onTime,
+		privilegeInfo,
+		limitCount,
+		trim(to_char(priceOld/100,'999999999999990.99'))	as priceOld,
+		trim(to_char(priceNow/100,'999999999999990.99'))	as priceNow,
+		defaultSku,
+		peisongType,
+		isInvoice,
+		limitDate,
+		rn
+
+		from (select *
+		from (select t.goods_id as ID,
+		t.goods_key as goodsKey,
+		t.shop_key as shopKey,
+		t.goods_name as	goodsName,
+		t.goods_type as goodsType,
+		t.goods_size as goodsSize,
+		t.peisong as peiSong,
+		t.serve_info as serveInfo,
+		t.goods_pics as	goodsPics,
+		t.goods_kind as goodsKind,
+		t.add_time as addTime,
+		t.upp_time as uppTime,
+		t.status as status,
+		t.province_code as province,
+		t.city_code	as city,
+		t.area_code as area,
+		t.query_opts as queryOpts,
+		t.sale_title as	saleTitle,
+		t.goods_count as goodsCount,
+		t.goods_code as goodsCode,
+		t.on_sale as onSale,
+		t.off_time as offTime,
+		t.on_time as onTime,
+		t.privilege_info as privilegeInfo,
+		t.limit_count as limitCount,
+		t.PRICE_OLD as priceOld,
+		t.PRICE_NOW as priceNow,
+		t.DEFAULT_SKU as defaultSku,
+		t.PEISONG_TYPE as peisongType,
+		t.IS_INVOICE as isInvoice,
+		t.LIMIT_DATE as limitDate,
+		row_number() over(order by t.PRICE_NOW $sort$) rn
+		from base_shop_goods_info t
+		where t.shop_key = #shopKey#
+		and t.STATUS = '0'
+		<isNotEmpty prepend=" AND " property="toPrice">
+			t.PRICE_NOW between #fromPrice# and #toPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="onSale">
+			t.ON_SALE  = #onSale#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.GOODS_NAME like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		 <isNotEmpty prepend=" AND "  property="toTime">
+			t.ON_TIME between #fromTime# and #toTime#
+		 </isNotEmpty>
+		<isNotEmpty prepend=" AND " property="peisongType">
+			t.PEISONG_TYPE = #peisongType#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="typeKey">
+			exists (
+                      select  s.type_key from base_shop_goods_type s
+                      where t.goods_type = s.type_key
+                      and s.STATUS = '0'
+                      and s.is_end = '0'
+                      start with s.type_key = #typeKey#
+                      connect by prior s.type_key = s.sup_type_key
+
+                  )
+		</isNotEmpty>
+		) 
+		
+		 )
+		 where rn between #fromNum#	 and #toNum#
+	</select>
+	
+	<!-- 根据商家信息类别查询商品列表(根据销量排序) -->
+	<select id="queryShopGListBySale" parameterClass="ReqGoodsInfo"		resultMap="RspGoodsInfoMap">
+		select 
+		ID,
+		goodsKey,
+		shopKey,
+		goodsName,
+		goodsType,
+		goodsSize,
+		peiSong,
+		serveInfo,
+		goodsPics,
+		goodsKind,
+		addTime,
+		uppTime,
+		status,
+		province,
+		city,
+		area,
+		queryOpts,
+		saleTitle,
+		goodsCount,
+		goodsCode,
+		onSale,
+		offTime,
+		onTime,
+		privilegeInfo,
+		limitCount,
+		trim(to_char(priceOld/100,'999999999999990.99'))	as priceOld,
+		trim(to_char(priceNow/100,'999999999999990.99'))	as priceNow,
+		defaultSku,
+		peisongType,
+		isInvoice,
+		limitDate,
+		rn
+
+		from (select *
+		from (select t.goods_id as ID,
+		t.goods_key as goodsKey,
+		t.shop_key as shopKey,
+		t.goods_name as	goodsName,
+		t.goods_type as goodsType,
+		t.goods_size as goodsSize,
+		t.peisong as peiSong,
+		t.serve_info as serveInfo,
+		t.goods_pics as	goodsPics,
+		t.goods_kind as goodsKind,
+		t.add_time as addTime,
+		t.upp_time as uppTime,
+		t.status as status,
+		t.province_code as province,
+		t.city_code	as city,
+		t.area_code as area,
+		t.query_opts as queryOpts,
+		t.sale_title as	saleTitle,
+		t.goods_count as goodsCount,
+		t.goods_code as goodsCode,
+		t.on_sale as onSale,
+		t.off_time as offTime,
+		t.on_time as onTime,
+		t.privilege_info as privilegeInfo,
+		t.limit_count as limitCount,
+		t.PRICE_OLD as priceOld,
+		t.PRICE_NOW as priceNow,
+		t.DEFAULT_SKU as defaultSku,
+		t.PEISONG_TYPE as peisongType,
+		t.IS_INVOICE as isInvoice,
+		t.LIMIT_DATE as limitDate,
+		row_number() over(order by f_shop_goods_sale_num(t.goods_key) $sort$) rn
+		from base_shop_goods_info t
+		where t.shop_key = #shopKey#
+		and t.STATUS = '0'
+		<isNotEmpty prepend=" AND " property="toPrice">
+			t.PRICE_NOW between #fromPrice# and #toPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.GOODS_NAME like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="onSale">
+			t.ON_SALE = #onSale#
+		</isNotEmpty>
+		 <isNotEmpty prepend=" AND "  property="toTime">
+			t.ON_Time between #fromTime# and #toTime#
+		 </isNotEmpty>
+		<isNotEmpty prepend=" AND " property="peisongType">
+			t.PEISONG_TYPE = #peisongType#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="typeKey">
+			exists (
+                      select  s.type_key from base_shop_goods_type s
+                      where t.goods_type = s.type_key
+                      and s.STATUS = '0'
+                      and s.is_end = '0'
+                      start with s.type_key = #typeKey#
+                      connect by prior s.type_key = s.sup_type_key
+
+                  )
+		</isNotEmpty>
+		)
+		
+		 )
+		 where rn between #fromNum#	 and #toNum#
+	</select>
+	
+	<!-- 根据商家信息类别查询商品列表(根据添加时间排序) -->
+	<select id="queryShopGListByTime" parameterClass="ReqGoodsInfo"		resultMap="RspGoodsInfoMap">
+		select 
+		ID,
+		goodsKey,
+		shopKey,
+		goodsName,
+		goodsType,
+		goodsSize,
+		peiSong,
+		serveInfo,
+		goodsPics,
+		goodsKind,
+		addTime,
+		uppTime,
+		status,
+		province,
+		city,
+		area,
+		queryOpts,
+		saleTitle,
+		goodsCount,
+		goodsCode,
+		onSale,
+		offTime,
+		onTime,
+		privilegeInfo,
+		limitCount,
+		trim(to_char(priceOld/100,'999999999999990.99'))	as priceOld,
+		trim(to_char(priceNow/100,'999999999999990.99'))	as priceNow,
+		defaultSku,
+		peisongType,
+		isInvoice,
+		limitDate,
+		rn
+
+		from (select *
+		from (select t.goods_id as ID,
+		t.goods_key as goodsKey,
+		t.shop_key as shopKey,
+		t.goods_name as	goodsName,
+		t.goods_type as goodsType,
+		t.goods_size as goodsSize,
+		t.peisong as peiSong,
+		t.serve_info as serveInfo,
+		t.goods_pics as	goodsPics,
+		t.goods_kind as goodsKind,
+		t.add_time as addTime,
+		t.upp_time as uppTime,
+		t.status as status,
+		t.province_code as province,
+		t.city_code	as city,
+		t.area_code as area,
+		t.query_opts as queryOpts,
+		t.sale_title as	saleTitle,
+		t.goods_count as goodsCount,
+		t.goods_code as goodsCode,
+		t.on_sale as onSale,
+		t.off_time as offTime,
+		t.on_time as onTime,
+		t.privilege_info as privilegeInfo,
+		t.limit_count as limitCount,
+		t.PRICE_OLD as priceOld,
+		t.PRICE_NOW as priceNow,
+		t.DEFAULT_SKU as defaultSku,
+		t.PEISONG_TYPE as peisongType,
+		t.IS_INVOICE as isInvoice,
+		t.LIMIT_DATE as limitDate,
+		row_number() over(order by $onSaleSort$ $sort$) rn
+		from base_shop_goods_info t
+		where t.shop_key = #shopKey#
+		and t.STATUS ='0'
+		<isNotEmpty prepend=" AND " property="toPrice">
+			t.PRICE_NOW between #fromPrice# and #toPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.GOODS_NAME like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="onSale">
+			t.ON_SALE  = #onSale#
+		</isNotEmpty>
+		 <isNotEmpty prepend=" AND "  property="toTime">
+			t.ON_TIME between #fromTime# and #toTime#
+		 </isNotEmpty>
+		<isNotEmpty prepend=" AND " property="peisongType">
+			t.PEISONG_TYPE = #peisongType#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="typeKey">
+			exists (
+                      select  s.type_key from base_shop_goods_type s
+                      where t.goods_type = s.type_key
+                      and s.STATUS = '0'
+                      and s.is_end = '0'
+                      start with s.type_key = #typeKey#
+                      connect by prior s.type_key = s.sup_type_key
+
+                  )
+		</isNotEmpty>
+		)
+		 )
+		 where rn between #fromNum#	 and #toNum#
+	</select>
+	
+	<!-- 查询商品总条数 -->
+	<select id="queryGListCountByShop" parameterClass="ReqGoodsInfo"	resultClass="java.lang.String">
+		select count(t.GOODS_KEY)
+		from base_shop_goods_info t
+		where t.shop_key = #shopKey#
+		and t.STATUS = '0'
+		<isNotEmpty prepend=" AND " property="toPrice">
+			t.PRICE_NOW between #fromPrice# and #toPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.GOODS_NAME like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="onSale">
+			t.ON_SALE = #onSale#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="peisongType">
+			t.PEISONG_TYPE = #peisongType#
+		</isNotEmpty>
+		 <isNotEmpty prepend=" AND "  property="toTime">
+			t.ON_TIME between #fromTime# and #toTime#
+		 </isNotEmpty>
+		<isNotEmpty prepend=" AND " property="typeKey">
+			exists (
+                      select  s.type_key from base_shop_goods_type s
+                      where t.goods_type = s.type_key
+                      and s.STATUS = '0'
+                      and s.is_end = '0'
+                      start with s.type_key = #typeKey#
+                      connect by prior s.type_key = s.sup_type_key
+
+                  )
+		</isNotEmpty>
+	</select>
+	
+	<!-- 查询三级类别商品总条数 -->
+	<select id="queryGListCountByTypeShop" parameterClass="ReqGoodsInfo"
+		resultClass="java.lang.String">
+		select count(t.GOODS_KEY)
+		from base_shop_goods_info t
+		where t.shop_key = #shopKey#
+		and t.STATUS = '0'
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.GOODS_NAME like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="peisongType">
+			t.PEISONG_TYPE = #peisongType#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="typeKey">
+			t.goods_type = #typeKey#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="fromPrice">
+			<![CDATA[	
+			 trim(to_char(t.PRICE_NOW /100,'999999999999990.99')) >= #fromPrice#
+			 ]]>
+		 </isNotEmpty>
+		 <isNotEmpty prepend=" AND " property="toPrice">
+			 <![CDATA[	
+				trim(to_char(t.PRICE_NOW /100,'999999999999990.99')) <= #toPrice#
+			 ]]>
+		 </isNotEmpty>
+		 <isNotEmpty prepend=" AND " property="fromTime">
+		 <![CDATA[	
+		 t.ON_TIME >= #fromTime#
+		 ]]>
+		 </isNotEmpty>
+		 <isNotEmpty prepend=" AND " property="toTime">
+		 <![CDATA[	
+		 t.ON_TIME <= #toTime#
+		 ]]>
+		 </isNotEmpty>
+	</select>
+	
+	<!-- 查询商品销量 -->
+	<select id="queryGoodsSale"  parameterClass="java.lang.String" resultClass="java.lang.String">
+		select f_shop_goods_sale_num(#goodsKey#) from dual
+	</select>
+
+	<!-- 查询商品sku库存量 -->
+	<select id="queryGoodsSkuStock"  parameterClass="java.lang.String" resultClass="java.lang.String">
+		select f_shop_goods_skustock(#skuKey#) from dual
+	</select>
+	
+	<!-- 根据商品 goodskey查询商品skuKey -->
+	<select id="querySkuKeyList" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select 	t.sku_key   	as skuKey
+         from BASE_SHOP_GOODS_SKU t
+         where	t.goods_key = #goodsKey#
+		 and	t.STATUS = '0'
+	</select>
+	
+	<!-- 查詢商鋪下的商品是否參與了秒殺活動 -->
+	<select id="queryActivity" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select count(t.goods_key) from BASE_TIME_LIMITED_SALES_SKU t,BASE_TIME_LIMITED_SALES_INFO s
+		where t.goods_key=#goods_key#
+		and t.status='0'
+		and s.status='0'
+		and t.sales_key=s.sales_key
+		and s.end_time>sysdate
+	</select>
+	
+</sqlMap>

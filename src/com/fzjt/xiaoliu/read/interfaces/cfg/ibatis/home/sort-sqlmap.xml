@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="sort">
+
+	<typeAlias alias="RspSortInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.sort.bean.rsp.RspSortInfo" />
+	<typeAlias alias="reqSortInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.sort.bean.req.ReqSortInfo" />
+	<!-- 分类信息 -->
+	<resultMap id="RspSortInfoMap" class="RspSortInfo">
+		<result property="sortKey" column="sortKey"></result>
+		<result property="sortName" column="sortName"></result>
+		<result property="logoImgURL" column="logoImgURL"></result>
+		<result property="linkURL" column="linkURL"></result>
+		<result property="indexNum" column="indexNum"></result>
+	</resultMap>
+	
+	<!-- 查询分类信息 -->
+	<select id="querySortInfo"  parameterClass="reqSortInfo" resultMap="RspSortInfoMap">
+		select t.	sortkey  as sortKey,
+				  t.sortname  as sortName,
+				  t.logoimgurl  as logoImgURL,
+				  t.linkurl  as linkURL,
+				  t.indexnum  as indexNum
+		from  BASE_APPHOME_SORT  t
+		 where t.province = #province#	
+			and t.city = #city#	
+		order by t.indexnum asc
+	</select>
+
+</sqlMap>

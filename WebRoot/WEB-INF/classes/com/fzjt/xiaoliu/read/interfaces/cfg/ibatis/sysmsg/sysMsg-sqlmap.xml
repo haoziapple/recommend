@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="sysMsg">
+
+	<typeAlias alias="ReqSysMsgInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sysmsg.bean.list.req.ReqSysMsgInfo" />
+	<typeAlias alias="RspSysMsgInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sysmsg.bean.list.rsp.RspSysMsgInfo" />
+
+	<!-- 查询推送消息 -->
+	<resultMap id="RspSysMsgInfoMap" class="RspSysMsgInfo">
+		<result property="title" column="title"></result>
+		<result property="alert" column="alert"></result>
+		<result property="msgContent" column="msgContent"></result>
+		<result property="addTime" column="addTime"></result>
+		<result property="msgKey" column="msgKey"></result>
+	</resultMap>
+
+
+	<!-- 查询推送消息列表 -->
+	<select id="queryPushSysMsg" parameterClass="ReqSysMsgInfo"
+		resultMap="RspSysMsgInfoMap">
+		select * from(
+		select * from(
+		select
+		t.title as title,
+		t.alert as alert,
+		t.msg_content as msgContent,
+		t.add_time as addTime,
+		t.msg_key as msgKey,
+		row_number() over(order by t.add_time desc) rn
+		from BASE_MANAGER_MSG_INFO t
+		where
+		t.province = #province#
+		and t.city = #city#
+		and
+		t.status = '0'
+		and t.push_type = '1'
+		)
+		 <![CDATA[  
+		 	where rn <= #toNum#
+		 )
+		 	where rn >= #fromNum#
+		 ]]>
+	</select>
+
+	<!-- 查询推送列表条数 -->
+	<select id="queryPushCount" parameterClass="ReqSysMsgInfo"
+		resultClass="java.lang.String">
+		select count(t.MSG_KEY)
+		from BASE_MANAGER_MSG_INFO t
+		where
+		t.province = #province#
+		and
+		t.city = #city#
+		and
+		t.status = '0'
+		and
+		t.push_type = '1'
+	</select>
+
+	<!-- 查询推送列表条数 -->
+	<select id="querySysMsgByKey" parameterClass="java.lang.String"
+		resultMap="RspSysMsgInfoMap">
+		select
+		t.title as title,
+		t.alert as alert,
+		t.msg_content as msgContent,
+		t.add_time as addTime,
+		t.msg_key as msgKey
+		from BASE_MANAGER_MSG_INFO t
+		where
+		t.MSG_KEY = #msgKey#
+		and t.status = '0'
+		and t.push_type = '1'
+	</select>
+</sqlMap>

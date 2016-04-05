@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="module">
+
+	<typeAlias alias="RspModuleInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.floor.module.bean.rsp.RspModuleInfo" />
+	<typeAlias alias="reqModuleInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.floor.module.bean.req.ReqModuleInfo" />
+	<!-- 楼层信息 -->
+	<resultMap id="RspModuleInfoMap" class="RspModuleInfo">
+		<result property="floorKey" column="floorKey"></result>
+		<result property="floorNum" column="floorNum"></result>
+		<result property="moduleTitle" column="moduleTitle"></result>
+		<result property="appKey" column="appKey"></result>
+	</resultMap>
+	
+	<!-- 查询楼层信息 -->
+	<select id="queryModule"  parameterClass="reqModuleInfo" resultMap="RspModuleInfoMap">
+		select  t.floorkey as floorKey,
+			       t.floornum    as floorNum,
+			       t.moduletitle as moduleTitle,
+			       t.appkey      as appKey
+			  from BASE_APPHOME_MODULE_FLOOR t
+			 where t.province = #province#	
+			   and t.city = #city#	
+			 order by t.floornum asc
+
+	</select>
+
+</sqlMap>

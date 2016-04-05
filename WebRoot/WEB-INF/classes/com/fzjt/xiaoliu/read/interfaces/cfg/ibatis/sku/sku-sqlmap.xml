@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="sku">
+
+<typeAlias alias="RspGoodsSkuInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.skuInfo.rsp.RspGoodsSkuInfo" />
+<typeAlias alias="RspSkuListInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.skuList.rsp.RspSkuListInfo" />
+<typeAlias alias="SkuListInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.skuList.req.SkuListInfo" />
+<typeAlias alias="RspSkuValInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.skuVal.rsp.RspSkuValInfo" />
+<typeAlias alias="ReqSkuValInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.skuVal.req.ReqSkuValInfo" />
+<typeAlias alias="RspPListInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.pvlist.rsp.RspPListInfo" />
+<typeAlias alias="RspVListInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.pvlist.rsp.RspVListInfo" />
+<typeAlias alias="RspPVKeyInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.pvkey.rsp.RspPVKeyInfo" />
+<typeAlias alias="reqPVListInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.pvlist.req.ReqPVListInfo" />
+<typeAlias alias="reqSkuListByGKey"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.list.rsp.SkuInfo" />
+		
+		
+	<!-- 商品sku信息 -->
+	<resultMap id="RspGoodsSkuInfoMap" class="RspGoodsSkuInfo">
+		<result property="ID" column="ID"></result>
+		<result property="skuKey" column="skuKey"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="vKey" column="vKey"></result>
+		<result property="skuName" column="skuName"></result>
+		<result property="status" column="status"></result>
+		<result property="stockNumber" column="stockNumber"></result>
+		<result property="postAge" column="postAge"></result>
+		<result property="typeKey" column="typeKey"></result>
+		<result property="skuPic" column="skuPic"></result>
+	</resultMap>
+		
+	<!-- 商品sku信息 -->
+	<resultMap id="RspSkuListMap" class="RspSkuListInfo">
+		<result property="ID" column="ID"></result>
+		<result property="skuKey" column="skuKey"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="vKey" column="vKey"></result>
+		<result property="skuName" column="skuName"></result>
+		<result property="status" column="status"></result>
+		<result property="stockNumber" column="stockNumber"></result>
+		<result property="postAge" column="postAge"></result>
+		<result property="typeKey" column="typeKey"></result>
+		<result property="skuPic" column="skuPic"></result>
+		<result property="skuTitle" column="skuTitle"></result>
+		<result property="rn" column="rn"></result>
+	</resultMap>
+	
+	<!-- 根据typekey查询的sku信息 -->
+	<resultMap id="RspSkuValMap" class="RspSkuValInfo">
+		<result property="ID" column="ID"></result>
+		<result property="skuKey" column="skuKey"></result>
+		<result property="skuName" column="skuName"></result>
+		<result property="stockNumber" column="stockNumber"></result>
+		<result property="postAge" column="postAge"></result>
+		<result property="skuTitle" column="skuTitle"></result>
+		<result property="skuPic" column="skuPic"></result>
+	</resultMap>
+	
+	<!-- 根据goodskey查询的特征量名称和特征量key -->
+	<resultMap id="RspPListMap" class="RspPListInfo">
+		<result property="pKey" column="pKey"></result>
+		<result property="pName" column="pName"></result>
+	</resultMap>
+	
+	<!-- 根据特征量key查询商品特征值list -->
+	<resultMap id="RspVListMap" class="RspVListInfo">
+		<result property="vKey" column="vKey"></result>
+		<result property="vName" column="vName"></result>
+	</resultMap>
+	
+	<!-- PVKey信息-->
+	<resultMap id="RspPVKeyInfoMap" class="RspPVKeyInfo">
+		<result property="pKey" column="pKey"></result>
+		<result property="vKey" column="vKey"></result>
+		<result property="pName" column="pName"></result>
+		<result property="vName" column="vName"></result>
+	</resultMap>
+
+	<!-- 根据goodskey商品sku信息 -->
+	<resultMap id="reqSkuListByGKeyMap" class="reqSkuListByGKey">
+		<result property="skuKey" column="skuKey"></result>
+		<result property="vKey" column="vKey"></result>
+		<result property="skuName" column="skuName"></result>
+		<result property="stockNumber" column="stockNumber"></result>
+		<result property="postAge" column="postAge"></result>
+		<result property="typeKey" column="typeKey"></result>
+		<result property="skuPic" column="skuPic"></result>
+		<result property="skuTitle" column="skuTitle"></result>
+		<result property="priceOld" column="priceOld"></result>
+		<result property="priceNow" column="priceNow"></result>
+	</resultMap>
+	
+	<!-- 根据商品 skuname和商品类型名查询商品sku信息 -->
+	<select id="querySkuListList" parameterClass="SkuListInfo" resultMap="RspSkuListMap">
+	select *
+  	from (select *
+          from (select *
+                  from (select t.id 			as ID,
+								t.sku_key   	as skuKey,
+								t.goods_key 	as goodsKey,
+								t.v_key 		as vKey,
+								t.sku_name		as skuName,
+								t.status 		as status,
+								f_shop_goods_skustock(t.sku_key)  as stockNumber,
+								t.postage 		as postAge,
+								t.type_key 		as typeKey,
+								t.sku_pic 		as skuPic,
+								t.sku_title		as skuTitle,
+							row_number() over(order by t.add_time asc) as rn
+                        from BASE_SHOP_GOODS_SKU t
+                        where 	t.sku_name like '%$skuName$%'
+						and		t.type_key = #typeKey#
+						and		t.STATUS = '0'
+                     	   )
+                  <![CDATA[	
+	    	     where rn >= #fromNum#	
+			        )
+						where rn <= #toNum#
+			     ]]>
+          )
+	</select>
+	
+	<!-- 查询符合条件商品总条数 -->
+	<select id="querySkuListCount"  parameterClass="SkuListInfo" resultClass="java.lang.String">
+		select count(t.SKU_KEY)
+		 from BASE_SHOP_GOODS_SKU  t
+		  where 	t.sku_name like '%$skuName$%'
+			and		t.type_key = #typeKey#
+			and		t.STATUS = '0'
+	</select>
+	
+	
+	<!-- 根据商品 skukey查询商品sku信息 -->
+	<select id="queryGoodsSkuInfoBySkuKey" parameterClass="java.lang.String" resultMap="RspGoodsSkuInfoMap">
+		select  t.id 			as ID,
+				t.sku_key   	as skuKey,
+				t.goods_key 	as goodsKey,
+				t.v_key 		as vKey,
+				t.sku_name		as skuName,
+				t.status 		as status,
+				f_shop_goods_skustock(t.sku_key)  as stockNumber,
+				t.postage 		as postAge,
+				t.type_key 		as typeKey,
+				t.sku_pic 		as skuPic
+		from 	BASE_SHOP_GOODS_SKU t
+		where 	t.sku_key = #skuKey#
+		and		t.STATUS = '0'
+	</select>
+	
+	<!-- 根据商品goodskey和vkey查询sku信息 -->
+	<select id="querySkuValByVKey" parameterClass="ReqSkuValInfo" resultMap="RspSkuValMap">
+		select  t.id 			as ID,
+				t.sku_key   	as skuKey,
+				t.sku_name		as skuName,
+				f_shop_goods_skustock(t.sku_key)  as stockNumber,
+				t.postage 		as postAge,
+				t.sku_title		as skuTitle,
+				t.sku_pic		as skuPic
+		from 	BASE_SHOP_GOODS_SKU t
+		where 	t.goods_key = #goodsKey#
+		and		t.v_key = #vKey#
+		and		t.STATUS = '0'
+	</select>
+	
+	<!-- 根据goodskey查询的特征量名称和特征量key -->
+	<select id="queryPInfolistByGoodsKey" parameterClass="java.lang.String" resultMap="RspPListMap">
+		select t.p_key as pKey, t.p_name as pName
+		  from BASE_SHOP_GOODS_PROPERTY_SALE t
+		 where exists (select t1.p_key as pKey
+		          from BASE_SHOP_GOODS_SKU_RELATION t1
+		         where t.P_KEY = t1.P_KEY
+		           and t1.GOODS_KEY = #goodsKey#
+		           and		t1.STATUS = '0'
+		           )
+		  and		t.STATUS = '0'
+		  order by t.order_flag asc
+	</select>
+	
+	<!-- 根据goodskey和特征量key查询商品特征值list -->
+	<select id="queryVListByGPKey" parameterClass="reqPVListInfo" resultMap="RspVListMap">
+		select  t.v_key   		as vKey,
+				t.v_name		as vName
+		from 	BASE_SHOP_GOODS_VALUE_SALE t
+		where   exists(
+			select s.v_key from BASE_SHOP_GOODS_SKU_RELATION s 
+			where t.P_KEY = #pKey#
+			and   s.goods_key=#goodsKey#
+			and   t.P_KEY = s.P_KEY
+			and	  t.v_key = s.v_key
+			and		s.STATUS = '0'
+			)
+		and		t.STATUS = '0'
+	</select>
+	
+	<!-- 根据特征量key查询商品特征值list -->
+	<select id="queryVListByPKey" parameterClass="java.lang.String" resultMap="RspVListMap">
+		select  t.v_key   		as vKey,
+				t.v_name		as vName
+		from 	BASE_SHOP_GOODS_VALUE_SALE t
+		where t.P_KEY = #pKey#
+		and t.STATUS = '0'
+		order by t.ORDER_FLAG asc
+	</select>
+	
+	<!-- 根据skukey查询  PVKey信息-->
+	<select id="queryPVListBySkuKey" parameterClass="java.lang.String" resultMap="RspPVKeyInfoMap">
+		select  t.p_key   		as pKey,
+				   p.p_name		as pName,
+				  t.v_key		    as vKey,
+				  s.v_name			as vName
+		from 	BASE_SHOP_GOODS_SKU_RELATION t ,
+					BASE_SHOP_GOODS_PROPERTY_SALE p,
+					BASE_SHOP_GOODS_VALUE_SALE s	
+		where   t.sku_key = #skuKey# 
+		and 		t.status='0'
+		and      t.P_KEY=p.P_KEY
+		and      t.V_KEY=s.V_KEY
+	</select>
+	
+	<!-- 根据goodskey查询的特征量名称和特征量key -->
+	<select id="queryPInfolistByTypeKey" parameterClass="java.lang.String" resultMap="RspPListMap">
+		select t.p_key as pKey, t.p_name as pName
+		  from BASE_SHOP_GOODS_PROPERTY_SALE t
+		 where t.TYPE_KEY = #typeKey#
+		 and t.STATUS = '0'
+		 order by t.order_flag asc
+	</select>
+	
+	<!-- 根据商品 goodskey查询商品sku信息 -->
+	<select id="querySkuListByGoodsKey" parameterClass="java.lang.String" resultMap="reqSkuListByGKeyMap">
+		select 	t.sku_key   	as skuKey,
+				t.v_key 		as vKey,
+				t.sku_name		as skuName,
+				t.status 		as status,
+				f_shop_goods_skustock(t.sku_key)  as stockNumber,
+				t.postage 		as postAge,
+				t.type_key 		as typeKey,
+				t.sku_pic 		as skuPic,
+				t.sku_title		as skuTitle,
+				trim(to_char(s.CURRENT_PRICE/100,'999999999999990.99'))	as priceNow,
+				trim(to_char(s.ORIGINAL_PRICE/100,'999999999999990.99'))	as priceOld,
+				row_number() over(order by t.add_time asc)
+         from BASE_SHOP_GOODS_SKU t, FZJT_TOTAL_PRICE_INFO@PAYDBL s
+         where	t.goods_key = #goodsKey#
+         and 	t.SKU_KEY = s.SKUKEY
+		 and	t.STATUS = '0'
+		 and s.price_mark_key='-1'
+	</select>
+	
+</sqlMap>

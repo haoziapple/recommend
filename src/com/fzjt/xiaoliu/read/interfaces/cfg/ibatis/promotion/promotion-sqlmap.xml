@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="promotion">
+
+	<typeAlias alias="reqPromotionInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.promotion.bean.info.req.ReqPromotionInfo" />
+	<typeAlias alias="promotionInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.promotion.bean.info.rsp.PromotionInfo" />
+		
+	<typeAlias alias="rspPromGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.promotion.bean.list.rsp.SkuInfo" />
+		
+	<typeAlias alias="rspPacketInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.promotion.bean.list.rsp.PacketInfo" />
+		
+	<typeAlias alias="rspDetailInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.promotion.bean.detail.RspDetailInfo" />
+	
+	<!-- 活动信息 -->
+	<resultMap id="promotionInfoMap" class="promotionInfo">
+		<result property="promotionKey" column="promotionKey"></result>
+		<result property="promotionName" column="promotionName"></result>
+		<result property="promotionPic" column="promotionPic"></result>
+		<result property="promotionUrl" column="promotionUrl"></result>
+	</resultMap>
+	
+	<!-- 活动组信息 -->
+	<resultMap id="rspPacketInfoMap" class="rspPacketInfo">
+		<result property="packetKey" column="packetKey"></result>
+		<result property="packetName" column="packetName"></result>
+	</resultMap>
+	
+	<!-- 活动商品信息 -->
+	<resultMap id="rspPromGoodsInfoMap" class="rspPromGoodsInfo">
+		<result property="packetKey" column="packetKey"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="skuKey" column="skuKey"></result>
+		<result property="skuName" column="skuName"></result>
+		<result property="picUrl" column="picUrl"></result>
+		<result property="priceOld" column="priceOld"></result>
+		<result property="priceNow" column="priceNow"></result>
+		<result property="skuTitle" column="skuTitle"></result>
+	</resultMap>
+	
+	<!-- 活动详细信息 -->
+	<resultMap id="rspDetailInfoMap" class="rspDetailInfo">
+		<result property="promotionKey" column="promotionKey"></result>
+		<result property="promotionName" column="promotionName"></result>
+		<result property="promotionPic" column="promotionPic"></result>
+		<result property="promotionUrl" column="promotionUrl"></result>
+		<result property="shareTitle" column="shareTitle"></result>
+		<result property="shareDesc" column="shareDesc"></result>
+		<result property="sharePic" column="sharePic"></result>
+	</resultMap>
+	
+	<!-- 查询活动信息 -->
+	<select id="queryPromotionList" parameterClass="reqPromotionInfo"	resultMap="promotionInfoMap">
+		select  t.PROMOTION_KEY 	as promotionKey,
+				t.PROMOTION_NAME	as promotionName,
+				t.PROMOTION_PIC		as promotionPic,
+				t.PROMOTION_URL		as promotionUrl
+		from BASE_WAP_PROMOTION_INFO t
+		where t.PROVINCE = #province#
+		and	  t.CITY = #city#
+		and t.STATUS = '0'
+		order by t.ORDER_FLAG asc
+	</select>
+	
+	<!-- 查询活动组key -->
+	<select id="queryPacketKeyList" parameterClass="java.lang.String"	resultMap="rspPacketInfoMap">
+		select  t.PACKET_KEY as packetKey,
+				t.PACKET_NAME as packetName
+		from BASE_WAP_PROMOTION_PACKET t
+		where t.PROMOTION_KEY = #promKey#
+		and t.STATUS = '0'
+		order by t.ORDER_FLAG asc
+	</select>
+	
+	<!-- 查询活动组商品信息 -->
+	<select id="queryPacketGoodsInfo" parameterClass="java.lang.String"	resultMap="rspPromGoodsInfoMap">
+		select t.PACKET_KEY as packetKey,
+				t.GOODS_KEY as goodsKey,
+				t.SKU_KEY	as skuKey,
+				t.SKU_NAME	as skuName,
+				t.PIC_URL	as picUrl,
+				t.SKU_TITLE	as skuTitle,
+        		trim(to_char(s.ORIGINAL_PRICE/100,'999999999999990.99'))	as priceOld,
+				trim(to_char(s.CURRENT_PRICE/100,'999999999999990.99'))	as priceNow
+			from BASE_WAP_PROMOTION_GOODS t, FZJT_TOTAL_PRICE_INFO@PAYDBL s
+			where t.PACKET_KEY = #packetKey#
+			and t.STATUS = '0'
+			and s.GOODS_KEY = t.GOODS_KEY
+			and s.SKUKEY = t.SKU_KEY
+			and s.PRICE_MARK_KEY = '-1'
+			order by t.ORDER_FLAG asc
+	</select>
+	
+	<!-- 查询活动详细信息 -->
+	<select id="queryPromotionInfo" parameterClass="java.lang.String"	resultMap="rspDetailInfoMap">
+		select  t.PROMOTION_KEY 	as promotionKey,
+				t.PROMOTION_NAME	as promotionName,
+				t.PROMOTION_PIC		as promotionPic,
+				t.PROMOTION_URL		as promotionUrl,
+				t.SHARE_TITLE 		as shareTitle,
+				t.SHARE_DESC		as shareDesc,
+				t.SHARE_PIC			as sharePic
+		from BASE_WAP_PROMOTION_INFO t
+		where t.PROMOTION_KEY = #promKey#
+		and t.STATUS = '0'
+	</select>
+
+</sqlMap>

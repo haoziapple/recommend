@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="recommend">
+	<typeAlias alias="itemVoteInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.recommend.bean.ItemVoteInfo" />
+	<typeAlias alias="userVoteInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.recommend.bean.UserVoteInfo" />
+
+
+	<!-- 产品打分信息 -->
+	<resultMap id="itemVoteInfoMap" class="itemVoteInfo">
+		<result property="userKey" column="userKey"></result>
+		<result property="point" column="point"></result>
+	</resultMap>
+
+	<!-- 用户打分信息 -->
+	<resultMap id="userVoteInfoMap" class="userVoteInfo">
+		<result property="itemKey" column="itemKey"></result>
+		<result property="point" column="point"></result>
+	</resultMap>
+
+
+	<!-- 获取所有的有效物品 -->
+	<select id="queryAllItem" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		select t.GOODS_KEY from BASE_SHOP_GOODS_INFO t
+		where 1=1
+		and t.STATUS='0' and t.ON_SALE = '0'
+	</select>
+
+	<!-- 获取物品打分列表(浏览次数) -->
+	<select id="queryItemVoteInfo" parameterClass="java.lang.String"
+		resultMap="itemVoteInfoMap">
+		select count(1) as point, t.USERKEY as userKey from
+		BASE_SHOP_VISIT_HISTORY t
+		where 1=1
+		and t.STATUS = '0'
+		and t.GOODS_KEY = #itemKey#
+		GROUP BY t.USERKEY
+	</select>
+
+	<!-- 获取所有的有效用户 -->
+	<select id="queryAllUser" parameterClass="java.lang.String"
+		resultClass="java.lang.String">
+		select t.USERKEY from BASE_SHOP_VISIT_HISTORY t
+		where 1=1
+		GROUP BY t.USERKEY
+	</select>
+
+	<!--获取用户打分列表(浏览次数) -->
+	<select id="queryUserVoteInfo" parameterClass="java.lang.String"
+		resultMap="userVoteInfoMap">
+		select count(1) as point, t.GOODS_KEY as itemKey from
+		BASE_SHOP_VISIT_HISTORY t
+		where 1=1
+		and t.STATUS = '0'
+		and t.USERKEY = #userKey#
+		GROUP BY t.GOODS_KEY
+	</select>
+</sqlMap>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="customer">
+	<!-- 客户 customer BEAN -->
+	<typeAlias alias="customerBean" type="com.fzjt.xiaoliu.read.interfaces.business.usercenter.customer.bean.CustomerInfo"/>
+	<resultMap id="CustomerInfoamp" class="customerBean">
+		<result property="userKey" column="userKey"></result>
+		<result property="userName" column="userName"></result>
+		<result property="nickName" column="nickName"></result>
+		<result property="headPortrait" column="headPortrait"></result>
+		<result property="sex" column="sex"></result>
+		<result property="dbirthday" column="dbirthday"></result>
+		<result property="email" column="email"></result>
+		<result property="phoneNumber" column="phoneNumber"></result>
+		<result property="address" column="address"></result>
+		<result property="idCard" column="idCard"></result>
+		<result property="qqNum" column="qqNum"></result>
+		<result property="wechat" column="wechat"></result>
+	</resultMap>
+	<!-- 根据 通用标识符 获取客户 customer BEAN -->
+	<select id="queryCustomerInfoByUserKey" parameterClass="java.lang.String" resultMap="CustomerInfoamp">
+		select t.userkey userKey,
+		t.username userName,
+		t.nickname nickName,
+		t.head_portrait headPortrait,
+		t.sex sex,
+		t.birthday dbirthday,
+		t.email email,
+		t.phone_number phoneNumber,
+		t.address address,
+		t.id_card idCard,
+		t.qq_num qqNum,
+		t.wechat wechat
+		from BASE_BUSINESS_CUSTOMER t
+		where t.userkey = #s#
+	</select>
+
+
+
+
+
+</sqlMap>

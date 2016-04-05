@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="type">
+	<typeAlias alias="RspTypeInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.type.bean.rsp.RspTypeInfo" />
+
+	<!-- 商品类型信息 -->
+	<resultMap id="RspTypeInfoMap" class="RspTypeInfo">
+		<result property="typeKey" column="typeKey"></result>
+		<result property="supTypeKey" column="supTypeKey"></result>
+		<result property="typeName" column="typeName"></result>
+		<result property="typeDesc" column="typeDesc"></result>
+		<result property="orderFlag" column="orderFlag"></result>
+		<result property="isEnd" column="isEnd"></result>
+		<result property="typeColor" column="typeColor"></result>
+		<result property="typePic" column="typePic"></result>
+		<result property="isShow" column="isShow"></result>
+	</resultMap>
+
+
+	<!--根据typekey查询商品种类树结构-->
+	<select id="queryGoodsTypeByKey" resultMap="RspTypeInfoMap" parameterClass="java.lang.String">
+	  select
+        t.type_key               as typeKey,
+        t.sup_type_key         as supTypeKey,
+        t.type_name             as typeName,
+        t.type_desc              as typeDesc,
+        t.order_flag             as orderFlag,
+        t.is_end                    as isEnd,
+        t.type_color              as typeColor,
+        t.type_pic                  as typePic,
+        t.is_show                   as isShow
+       from base_shop_goods_type t
+      	where t.sup_type_key=#typeKey# and t.status='0'
+      	 order by t.order_flag asc
+	</select>
+	
+	
+		<!--查询商品种类树结构-->
+	<select id="queryGoodsType" resultMap="RspTypeInfoMap" >
+	  select
+        t.type_key               as typeKey,
+        t.sup_type_key         as supTypeKey,
+        t.type_name             as typeName,
+        t.type_desc              as typeDesc,
+        t.order_flag             as orderFlag,
+        t.is_end                    as isEnd,
+        t.type_color              as typeColor,
+        t.type_pic                  as typePic,
+        t.is_show                   as isShow
+      from base_shop_goods_type t
+      where t.status = '0'
+     start with t.sup_type_key='0'
+   	 connect by prior t.type_key=t.sup_type_key
+   	  ORDER siblings BY t.order_flag
+	</select>
+	
+</sqlMap>

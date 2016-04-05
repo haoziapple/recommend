@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="account">
+	<typeAlias alias="RspAccountInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.account.bean.rsp.RspAccountInfo" />
+	<!-- account信息 -->
+	<resultMap id="RspAccountInfoMap" class="RspAccountInfo">
+		<result property="account" column="account"></result>
+	</resultMap>
+
+	<!-- 查询account号 -->
+	<select id="queryAccountByKey" parameterClass="java.lang.String"
+		resultMap="RspAccountInfoMap">
+		select t.ACCOUNT as account
+		from BASE_BUSINESS_ACCOUNT t
+		where t.USERKEY = #userkey#
+	</select>
+
+</sqlMap>

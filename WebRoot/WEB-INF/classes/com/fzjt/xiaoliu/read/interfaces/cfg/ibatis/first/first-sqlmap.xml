@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="first">
+
+<typeAlias alias = "firstBean" type="com.fzjt.xiaoliu.read.interfaces.business.first.bean.FirstBean"/>
+
+<resultMap id="firstInfoMap" class="firstBean">
+	<result property="goodsKey" column="goodsKey"></result>
+	<result property="goodsName" column="goodsName"></result>
+	<result property="goodsDesc" column="goodsDesc"></result>
+	<result property="oldPrice" column="oldPrice"></result>
+	<result property="nowPrice" column="nowPrice"></result>
+	<result property="goodsUrl" column="goodsUrl"></result>
+	<result property="sort" column="sort"></result>
+	<result property="serviceTypeKey" column="serviceTypeKey"></result>
+	<result property="goodsType" column="goodsType"></result>
+</resultMap>
+
+<select id="queryFirstList" parameterClass="firstBean" resultMap="firstInfoMap">
+	select  t.goods_key goodsKey,
+			t.goods_name goodsName,
+			t.goods_desc goodsDesc,
+			t.old_price oldPrice,
+			t.now_price nowPrice,
+			t.goods_url goodsUrl,
+			t.sort sort，
+			t.service_type_key serviceTypeKey,
+			t.goods_type goodsType,
+			row_number() over(order by t.sort desc) rn
+	from base_shop_first_info t where 1=1 and t.status='0'
+			and t.service_type_key=#serviceTypeKey#
+		   <isNotEmpty prepend=" AND " property="province">   
+            t.provice = #province# 
+           </isNotEmpty>
+            <isNotEmpty prepend=" AND " property="city">   
+            t.city = #city# 
+           </isNotEmpty>
+           <isNotEmpty prepend=" AND " property="area">   
+            t.area = #area# 
+           </isNotEmpty>
+</select>
+
+
+</sqlMap>

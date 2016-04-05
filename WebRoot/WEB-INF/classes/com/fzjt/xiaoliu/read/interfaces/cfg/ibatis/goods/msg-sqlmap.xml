@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="msg">
+	<typeAlias alias="RspMsgInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.msg.bean.list.rsp.RspMsgInfo" />
+	<typeAlias alias="ReqMsgInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.msg.bean.list.req.ReqMsgInfo" />
+
+	<typeAlias alias="reqMsg4ShopInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.msg.bean.shop.req.ReqMsg4ShopInfo" />
+	<typeAlias alias="rspMsgInfo4Shop"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.msg.bean.shop.rsp.RspMsgInfo4Shop" />
+
+	<typeAlias alias="reqMsg4UserInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.usercenter.msg.bean.customer.req.ReqMsg4UserInfo" />
+
+	<!-- 商品留言信息 -->
+	<resultMap id="RspMsgInfoMap" class="RspMsgInfo">
+		<result property="msgKey" column="msgKey"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="userKey" column="userKey"></result>
+		<result property="shopKey" column="shopKey"></result>
+		<result property="msgInfo" column="msgInfo"></result>
+		<result property="replyInfo" column="replyInfo"></result>
+		<result property="addTime" column="addTime"></result>
+		<result property="replyTime" column="replyTime"></result>
+		<result property="replyStatus" column="replyStatus"></result>
+		<result property="nickName" column="nickName"></result>
+		<result property="headPic" column="headPic"></result>
+		<result property="indexNum" column="RN"></result>
+	</resultMap>
+
+	<!-- 商品留言信息 -->
+	<resultMap id="RspMsgInfo4ShopMap" class="rspMsgInfo4Shop">
+		<result property="msgKey" column="msgKey"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="goodsName" column="goodsName"></result>
+		<result property="goodsPic" column="goodsPic"></result>
+		<result property="userKey" column="userKey"></result>
+		<result property="shopKey" column="shopKey"></result>
+		<result property="msgInfo" column="msgInfo"></result>
+		<result property="replyInfo" column="replyInfo"></result>
+		<result property="addTime" column="addTime"></result>
+		<result property="replyTime" column="replyTime"></result>
+		<result property="replyStatus" column="replyStatus"></result>
+		<result property="nickName" column="nickName"></result>
+		<result property="headPic" column="headPic"></result>
+		<result property="indexNum" column="RN"></result>
+	</resultMap>
+
+
+	<!--查询商品留言 -->
+	<select id="queryGoodsMsg" resultMap="RspMsgInfoMap"
+		parameterClass="ReqMsgInfo">
+		select *
+		from (select *
+		from( select
+		t.msg_key as msgKey,
+		t.goods_key as
+		goodsKey,
+		t.user_key as userKey,
+		t.shop_key as shopKey,
+		t.msg_info as
+		msgInfo,
+		t.reply_info as replyInfo,
+		t.add_time as addTime,
+		t.reply_time
+		as replyTime,
+		t.reply_status as replyStatus,
+		c. nickname as nickName,
+		c.head_portrait as headPic,
+		row_number() over(order by t.add_time DESC)
+		rn
+		from BASE_SHOP_CUS_MESSAGE_INFO t,BASE_BUSINESS_CUSTOMER c
+		where
+		t.user_key=c.userkey and t.goods_key=#goodsKey# and t.status='0'
+		and
+		t.reply_status = '0'
+		)  	
+				    		 <![CDATA[
+				    		where rn >= #fromNum#	
+				    	)
+			 where rn <= #toNum#
+			   ]]>
+	</select>
+
+	<!-- 查询留言总条数 -->
+	<select id="queryMsgCountByKey" parameterClass="ReqMsgInfo"
+		resultClass="java.lang.String">
+		select count(t.MSG_KEY)
+		from BASE_SHOP_CUS_MESSAGE_INFO t
+		where
+		t.goods_key=#goodsKey#
+		and t.reply_status = '0'
+		and t.status='0'
+	</select>
+
+
+	<!--商家查询商品留言 -->
+	<select id="queryGoodsMsg4Shop" resultMap="RspMsgInfo4ShopMap"
+		parameterClass="reqMsg4ShopInfo">
+		select s.msgKey,
+		s.goodsKey,
+		g.goods_name as goodsName,
+		g.goods_pics as
+		goodsPic,
+		s.userKey,
+		c.nickname as nickName,
+		c.head_portrait as headPic,
+		s.shopKey,
+		s.msgInfo,
+		s.replyInfo,
+		s.addTime,
+		s.replyTime,
+		s.replyStatus,
+		s.rn
+		from (select *
+		from (select t.msg_key as msgKey,
+		t.goods_key as
+		goodsKey,
+		t.user_key as userKey,
+		t.shop_key as shopKey,
+		t.msg_info as
+		msgInfo,
+		t.reply_info as replyInfo,
+		t.add_time as addTime,
+		t.reply_time
+		as replyTime,
+		t.reply_status as replyStatus,
+		row_number() over(order by
+		t.add_time DESC) rn
+		from BASE_SHOP_CUS_MESSAGE_INFO t
+		where 1=1
+		and
+		t.status = '0'
+		and t.shop_key = #shopKey#
+		<isNotEmpty prepend=" AND " property="replyType">
+			t.reply_status
+			=#replyType#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsKey">
+			t.goods_key
+			=#goodsKey#
+		</isNotEmpty>
+		)
+		where 1=1
+		         <![CDATA[
+		         and rn >= #fromNum#	
+		         ]]>    		
+			     <![CDATA[
+			   	 and rn <= #toNum#
+				 ]]>
+		) s,
+		base_shop_goods_info g,
+		base_business_customer c
+		where s.goodsKey =
+		g.goods_key
+		and s.userKey = c.userkey
+		order by s.addtime desc
+	</select>
+
+
+	<!-- 查询留言总条数 -->
+	<select id="queryMsgCountByShop" parameterClass="reqMsg4ShopInfo"
+		resultClass="java.lang.String">
+		select count(t.MSG_KEY)
+		from BASE_SHOP_CUS_MESSAGE_INFO t
+		where 1=1
+		and t.status
+		= '0'
+		and t.shop_key = #shopKey#
+		<isNotEmpty prepend=" AND " property="replyType">
+			t.reply_status
+			=#replyType#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsKey">
+			t.goods_key
+			=#goodsKey#
+		</isNotEmpty>
+	</select>
+
+	<!--用户查询商品留言 -->
+	<select id="queryGoodsMsg4User" resultMap="RspMsgInfo4ShopMap"
+		parameterClass="reqMsg4UserInfo">
+		select *
+		from (select s.msgKey,
+		s.goodsKey,
+		g.goods_name as goodsName,
+		g.goods_pics as goodsPic,
+		s.userKey,
+		c.nickname as nickName,
+		c.head_portrait as headPic,
+		s.shopKey,
+		s.msgInfo,
+		s.replyInfo,
+		s.addTime,
+		s.replyTime,
+		s.replyStatus,
+		row_number() over(order by s.addTime DESC)
+		rn
+		from (select t.msg_key as msgKey,
+		t.goods_key as goodsKey,
+		t.user_key
+		as userKey,
+		t.shop_key as shopKey,
+		t.msg_info as msgInfo,
+		t.reply_info as
+		replyInfo,
+		t.add_time as addTime,
+		t.reply_time as replyTime,
+		t.reply_status as replyStatus
+		from BASE_SHOP_CUS_MESSAGE_INFO t
+		where
+		t.status = '0'
+		and t.USER_KEY = #userKey#
+		<isNotEmpty prepend=" AND " property="replyStatus">
+			t.reply_status
+			=#replyStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsKey">
+			t.goods_key
+			=#goodsKey#
+		</isNotEmpty>
+		) s,
+		base_shop_goods_info g,
+		base_business_customer c
+		where s.goodsKey =
+		g.goods_key(+)
+		and s.userKey = c.userkey(+))
+		where rn between #fromNum#
+		and #toNum#
+
+	</select>
+
+	<!-- 用户查询留言总条数 -->
+	<select id="queryMsgCountByUser" parameterClass="reqMsg4UserInfo"
+		resultClass="java.lang.String">
+		select count(t.MSG_KEY)
+		from BASE_SHOP_CUS_MESSAGE_INFO t
+		where 1=1
+		and t.status
+		= '0'
+		and t.USER_KEY = #userKey#
+		<isNotEmpty prepend=" AND " property="replyStatus">
+			t.reply_status
+			=#replyStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsKey">
+			t.goods_key
+			=#goodsKey#
+		</isNotEmpty>
+	</select>
+</sqlMap>

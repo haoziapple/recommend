@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="home">
+
+	<typeAlias alias="ReqTurnInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.turn.req.ReqTurnInfo" />
+	<typeAlias alias="RspTurnInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.turn.rsp.RspTurnInfo" />
+	<typeAlias alias="ReqPCBottomInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.bottom.req.ReqBottomInfo" />
+	<typeAlias alias="RspPCBottomInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.pc.home.bean.bottom.rsp.RspBottomInfo" />
+		
+	<!-- 图片轮转信息 -->
+	<resultMap id="RspTurnInfoMap" class="RspTurnInfo">
+		<result property="carouselKey" column="carouselKey"></result>
+		<result property="visitUrl" column="visitUrl"></result>
+		<result property="carouselImg" column="carouselImg"></result>
+		<result property="carouselDesc" column="carouselDesc"></result>
+		<result property="orderFlag" column="orderFlag"></result>
+	</resultMap>
+	
+	<!-- 查询底部按钮信息 -->
+	<resultMap id="RspPCBottomInfoMap" class="RspPCBottomInfo">
+		<result property="sloKey" column="sloKey"></result>
+		<result property="sloName" column="sloName"></result>
+		<result property="sloLogo" column="sloLogo"></result>
+		<result property="sloDesc" column="sloDesc"></result>
+	</resultMap>
+	
+	<!-- 查询pc首页图片轮转信息 -->
+	<select id="queryTurnInfo"  parameterClass="ReqTurnInfo"  resultMap="RspTurnInfoMap">
+		select t.	carousel_key  as carouselKey,
+				  t.visit_url  as visitUrl,
+				  t.carousel_img  as carouselImg,
+				  t.carousel_desc  as carouselDesc,
+				  t.order_flag  as orderFlag
+		from  BASE_PC_CAROUSEL_INFO t
+		where t.province =#province# and t.city=#city# and status='0'
+		order by t.order_flag asc
+	</select>
+	
+	<!-- 查询pc首页底部按钮 -->
+	<select id="queryBottomInfo"  parameterClass="ReqPCBottomInfo"  resultMap="RspPCBottomInfoMap">
+		select t.	slo_key  as sloKey,
+				  t.slo_name  as sloName,
+				  t.slo_pic  as sloLogo,
+				  t.slo_desc  as sloDesc
+		from  BASE_PC_BOTTOM_SLOGAN t
+		where t.province =#province# and t.city=#city# and status='0'
+	</select>
+
+
+</sqlMap>

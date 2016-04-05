@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="activity">
+
+	<typeAlias alias="reqActivityInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.activity.bean.info.req.ReqActivityInfo" />
+	<typeAlias alias="rspActivityInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.activity.bean.info.rsp.ActivityInfo" />
+	<typeAlias alias="reqRelationInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.activity.bean.Relation.req.ReqRelationInfo" />
+	<typeAlias alias="rspRelationInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.activity.bean.Relation.rsp.RelationInfo" />
+	<!-- 活动详细信息 -->
+	<resultMap id="rspActivityInfoMap" class="rspActivityInfo">
+		<result property="actvtKey" column="actvtKey"></result>
+		<result property="actvtName" column="actvtName"></result>
+		<result property="actvtPic" column="actvtPic"></result>
+		<result property="actvtDesc" column="actvtDesc"></result>
+		<result property="linkUrl" column="linkUrl"></result>
+		<result property="dateBegin" column="dateBegin"></result>
+		<result property="dateEnd" column="dateEnd"></result>
+	</resultMap>
+	
+	<!-- 查询活动信息 -->
+	<select id="queryActivityList" parameterClass="reqActivityInfo"	resultMap="rspActivityInfoMap">
+		select  t.ACTVT_KEY 	as actvtKey,
+				t.ACTVT_NAME	as actvtName,
+				t.ACTVT_PIC		as actvtPic,
+				t.ACTVT_DESC	as actvtDesc,
+				t.LINK_URL		as linkUrl,
+				t.DATE_BEGIN	as dateBegin,
+				t.DATE_END		as dateEnd
+		from BASE_ACTIVITIES_INFO t
+		where t.PROVINCE = #province#
+		and	  t.CITY = #city#
+		and t.STATUS = '0'
+		order by t.ORDER_FLAG asc
+	</select>
+	
+	<!-- 查询我参与的活动key列表 -->
+	<select id="queryRelationList" parameterClass="reqRelationInfo" resultClass = "java.lang.String">
+	select t.ACTVT_KEY as actvtKey
+	from BASE_ACTIVITIES_USER_RELATION t
+	where t.USER_KEY = #userKey#
+	and t.PROVINCE = #province#
+	and t.city = #city#
+	order by t.EDIT_TIME asc
+	</select>
+	
+	<!-- 查询活动key对于的活动信息 -->
+	<select id="queryActivityInfo" parameterClass="java.lang.String"	resultMap="rspActivityInfoMap">
+		select  t.ACTVT_KEY 	as actvtKey,
+				t.ACTVT_NAME	as actvtName,
+				t.ACTVT_PIC		as actvtPic,
+				t.ACTVT_DESC	as actvtDesc,
+				t.LINK_URL		as linkUrl,
+				t.DATE_BEGIN	as dateBegin,
+				t.DATE_END		as dateEnd
+		from BASE_ACTIVITIES_INFO t
+		where t.ACTVT_KEY = #actvtKey#
+	</select>
+	
+</sqlMap>

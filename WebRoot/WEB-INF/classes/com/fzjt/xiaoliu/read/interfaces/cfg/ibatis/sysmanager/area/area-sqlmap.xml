@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="area">
+	<typeAlias alias="RspAreaInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.sysmanager.area.bean.rsp.RspAreaInfo" />
+
+	<resultMap id="RspAreaInfoMap" class="RspAreaInfo">
+		<result property="areaCode" column="areaCode"></result>
+		<result property="areaName" column="areaName"></result>
+		<result property="superAreaCode" column="superAreaCode"></result>
+		<result property="status" column="status"></result>
+	</resultMap>
+
+
+	<!--根据上级区域code查询下级区域列表 -->
+	<select id="queryAreaList" resultMap="RspAreaInfoMap" parameterClass="java.lang.String">
+	  select
+        t.area_code as areaCode,
+        t.area_name as areaName,
+        t.super_area_code as superAreaCode,
+        t.status as status
+      from system_manager_area_code t
+      	where t.super_area_code=#areaCode#
+      	and  t.status = '0'
+      	order by t.area_code
+<!--    start with t.area_super_id='0' -->
+<!--    	connect by prior t.areaid=t.area_super_id -->
+	</select>
+	
+	
+		<!--查询行政区划树结构 -->
+	<select id="queryAreaAllList" resultMap="RspAreaInfoMap" >
+	  select
+        t.area_code as areaCode,
+        t.area_name as areaName,
+        t.super_area_code as superAreaCode,
+        t.status as status
+      from system_manager_area_code t
+      where t.status = '0'
+   start with t.super_area_code='0'
+   	connect by prior t.area_code=t.super_area_code
+	</select>
+	
+</sqlMap>

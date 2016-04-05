@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="street">
+	<typeAlias alias="rspStreetInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.sysmanager.street.bean.info.rsp.RspStreetInfo" />
+
+	<resultMap id="rspStreetInfoMap" class="rspStreetInfo">
+		<result property="streetKey" column="streetKey"></result>
+		<result property="streetName" column="streetName"></result>
+		<result property="freeShipping" column="freeShipping"></result>
+		<result property="freight" column="freight"></result>
+	</resultMap>
+
+	
+		<!--查询行政区划树结构 -->
+	<select id="queryStreetInfoByAreaCode" resultMap="rspStreetInfoMap" >
+	  select
+        t.STREET_KEY as streetKey,
+        t.STREET_NAME as streetName,
+        t.FREE_SHIPPING as freeShipping,
+        t.FREIGHT as freight
+      from BASE_STREET_FREIGHT_INFO t
+      where t.status = '0'
+   	  and t.AREA_CODE = #areaCode#
+   	  order by t.ORDER_FLAG asc
+	</select>
+	
+</sqlMap>

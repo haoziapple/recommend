@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="homeGoods">
+
+<typeAlias alias="RspHomeGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.goods.bean.rsp.RspGoodsInfo" />
+<typeAlias alias="ReqHomeGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.goods.bean.req.ReqGoodsInfo" />
+		
+<!-- 商品信息 -->
+	<resultMap id="RspHomeGoodsInfoMap" class="RspHomeGoodsInfo">
+		<result property="ID" column="ID"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="goodsTitle" column="goodsTitle"></result>
+		<result property="goodsPics" column="goodsPics"></result>
+		<result property="indexNum" column="indexNum"></result>
+		<result property="priceOld" column="priceOld"></result>
+		<result property="priceNow" column="priceNow"></result>
+		<result property="onSale" column="onSale"></result>
+		<result property="rn" column="rn"></result>
+	</resultMap>
+	
+	<!-- 根据起始与截止条数，查询商品集合 -->
+	<select id="queryGoodsList" parameterClass="ReqHomeGoodsInfo"	resultMap="RspHomeGoodsInfoMap">
+	select *
+  from (select ID,
+               goodsKey,
+               goodsTitle,
+               goodsPics,
+               s.ON_SALE as onSale,
+               indexNum,
+               trim(to_char(s.PRICE_OLD / 100, '999999999999990.99')) as priceOld,
+               trim(to_char(S.PRICE_NOW / 100, '999999999999990.99')) as priceNow,
+               row_number() over(order by indexnum asc) rn
+          from (select t.id          as ID,
+                       t.goods_key   as goodsKey,
+                       t.goods_title as goodsTitle,
+                       t.goods_pics  as goodsPics,
+                       t.indexnum    as indexNum
+                  from BASE_APPHOME_GOODS t
+                 where t.province = #province#
+                   and t.city = #city#) t,
+               base_shop_goods_info s
+         where t.goodsKey = s.GOODS_KEY
+           and s.STATUS = '0')
+ where rn between #fromNum# and #toNum#
+	</select>
+	
+	<!-- 查询商品总条数 -->
+	<select id="queryGoodsCount"  parameterClass="ReqHomeGoodsInfo" resultClass="java.lang.String">
+		select count(t.ID)
+		 from BASE_APPHOME_GOODS  t,base_shop_goods_info g
+		  where t.province = #province#	
+			   and t.city = #city#	
+			   and t.GOODS_KEY = g.goods_key
+			   and g.STATUS='0'
+	</select>
+	
+	
+</sqlMap>

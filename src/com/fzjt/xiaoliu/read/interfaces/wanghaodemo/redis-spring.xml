@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context  
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName">
+
+	<context:component-scan base-package="com.fzjt.xiaoliu" />
+	<context:annotation-config />
+
+	<!-- 引入jedis配置文件 -->
+	<!-- ignore-unresolvable：是否忽略解析不到的属性，如果不忽略，找不到将抛出异常 -->
+	<!-- <context:property-placeholder location="classpath:wanghaodemo/redis.properties"/> -->
+
+	<!-- 设置jedis连接池 -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal">
+			<value>${redis.pool.maxActive}</value>
+		</property>
+		<property name="maxIdle">
+			<value>${redis.pool.maxIdle}</value>
+		</property>
+		<property name="testOnBorrow" value="true" />
+		<!-- return给pool时，是否提前进行validate操作 -->
+		<property name="testOnReturn" value="true" />
+	</bean>
+
+	<!-- 设置redisCluster连接池 -->
+	<bean name="genericObjectPoolConfig"
+		class=" org.apache.commons.pool2.impl.GenericObjectPoolConfig">
+		<property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}" />
+		<property name="maxTotal" value="${redis.pool.maxActive}" />
+		<property name="minIdle" value="${redis.pool.minIdle}" />
+		<property name="maxIdle" value="${redis.pool.maxIdle}" />
+	</bean>
+
+	<!-- 只设置了单个分片，如何使用多个分片待查 -->
+	<bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool"
+		scope="singleton">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1">
+			<list>
+				<bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg index="0" value="${redis.host}" />
+					<constructor-arg index="1" value="${redis.port}"
+						type="int" />
+					<constructor-arg index="2" value="${redis.timeout}"
+						type="int" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<!-- 单例模式,保证只生成一个jedisCluster实例 -->
+	<bean id="jedisCluster"
+		class="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.JedisClusterFactory">
+		<property name="addressConfig"
+			value="classpath:redis.properties"></property>
+		<!-- 属性文件里key的前缀 -->
+		<property name="addressKeyPrefix" value="redisCluster"></property>
+		<property name="timeout" value="300000" />
+		<property name="maxRedirections" value="6" />
+		<property name="genericObjectPoolConfig" ref="genericObjectPoolConfig" />
+	</bean>
+
+	<bean id="redisDataSource"
+		class="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.RedisDataSourceImpl">
+		<property name="shardedJedisPool" ref="shardedJedisPool"></property>
+	</bean>
+
+	<!-- 注入单片的redis与jedisCluster -->
+	<bean id="redisClientTemplate"
+		class="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.RedisClientTemplate">
+		<property name="redisDataSource" ref="redisDataSource"></property>
+		<property name="jedisCluster" ref="jedisCluster"></property>
+	</bean>
+	
+	<!-- 推荐DAO -->
+	<bean id="recommendDAO"
+		class="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.recommend.dao.impl.RecommendDAOImpl">
+		<property name="redisClientTemplate" ref="redisClientTemplate"></property>
+	</bean>
+	
+	<!-- 获取数据DAO -->
+	<bean id="fetchDataDAO"
+		class="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.recommend.dao.impl.FetchDataDAOImpl">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean>
+
+	<!-- 推荐系统service层 -->
+	<bean id="recommendService"
+		class="com.fzjt.xiaoliu.read.interfaces.wanghaodemo.recommend.service.impl.RecommendServiceImpl">
+		<property name="recommendDAO" ref="recommendDAO"></property>
+		<property name="fetchDataDAO" ref="fetchDataDAO"></property>
+	</bean>
+
+	<!-- <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig"> -->
+	<!-- <property name="maxIdle" value="${redis.maxIdle}" /> -->
+	<!-- <property name="maxActive" value="${redis.maxActive}" /> -->
+	<!-- <property name="maxWait" value="${redis.maxWait}" /> -->
+	<!-- <property name="maxTotal" value="${redis.maxActive}" /> -->
+	<!-- <property name="testOnBorrow" value="${redis.testOnBorrow}" /> -->
+	<!-- </bean> -->
+
+	<!-- <bean id="connectionFactory" -->
+	<!-- class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"> -->
+	<!-- <property name="host" value="${redis.host}" /> -->
+	<!-- <property name="port" value="${redis.port}" /> -->
+	<!-- <property name="poolConfig" ref="poolConfig" /> -->
+	<!-- </bean> -->
+
+	<!-- <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"> -->
+	<!-- <property name="connectionFactory" ref="connectionFactory" /> -->
+	<!-- </bean> -->
+</beans>

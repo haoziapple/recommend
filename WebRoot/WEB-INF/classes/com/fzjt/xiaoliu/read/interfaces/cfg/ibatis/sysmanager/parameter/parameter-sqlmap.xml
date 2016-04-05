@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="parameter">
+<!-- 根据参数key查询参数value-->
+<select id="queryParameterValue" parameterClass="java.lang.String" resultClass="java.lang.String">
+ select  t.paramter_value from system_parameter_info t where t.paramter_key = #key#
+</select>
+
+<!-- 获取系统时间 -->
+	<select id="querySysDate" resultClass="java.lang.String">
+		select to_char(sysdate,'yyyyMMddhh24miss') from dual
+	</select>
+</sqlMap>

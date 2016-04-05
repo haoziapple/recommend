@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="homeBottom">
+
+<typeAlias alias="RspBottomInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.bottom.bean.rsp.RspBottomInfo" />
+<typeAlias alias="ReqBottomInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.bottom.bean.req.ReqBottomInfo" />		
+		
+<!-- 底部按钮信息 -->
+	<resultMap id="RspBottomInfoMap" class="RspBottomInfo">
+		<result property="ID" column="ID"></result>
+		<result property="bottomKey" column="bottomKey"></result>
+		<result property="bottomName" column="bottomName"></result>
+		<result property="logoImgUrl" column="logoImgUrl"></result>
+		<result property="linkUrl" column="linkUrl"></result>
+		<result property="indexNum" column="indexNum"></result>
+		<result property="addTime" column="addTime"></result>
+		<result property="bottomType" column="bottomType"></result>
+		<result property="province" column="province"></result>
+		<result property="city" column="city"></result>
+	</resultMap>
+
+	<!-- 根据定位省市查询底部按钮集合 -->
+	<select id="queryBottomList" parameterClass="ReqBottomInfo"
+		resultMap="RspBottomInfoMap">
+		select t.id as ID,
+		t.bottomkey as bottomKey,
+		t.bottomname as
+		bottomName,
+		t.logoimgurl as logoImgUrl,
+		t.linkurl as linkUrl,
+		t.indexnum
+		as indexNum,
+		t.add_time as addTime,
+		t.bottom_type as bottomType,
+		t.province as province,
+		t.city as city
+		from BASE_APPHOME_BOTTOM t
+		where
+		t.province = #province#
+		and t.city = #city#
+		order by t.indexnum
+	</select>
+	
+	
+</sqlMap>

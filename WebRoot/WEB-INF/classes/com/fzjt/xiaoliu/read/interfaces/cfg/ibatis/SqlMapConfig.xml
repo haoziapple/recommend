@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+		lazyLoadingEnabled="true" maxRequests="32" maxSessions="10"
+		maxTransactions="5" useStatementNamespaces="true" />
+
+	<!-- 参数信息 Ibatis文件 -->
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/sysmanager/parameter/parameter-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/first/first-sqlmap.xml" /> 
+<!-- 	商品模块 -->
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/goods/goods-sqlmap.xml" /> 
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/usercenter/customer-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/home/module-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/home/content-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/home/turnImg-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/home/sort-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/home/homeGoods-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/sku/sku-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/home/homeBottom-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/sysmanager/area/area-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/goods/type-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/sku/property-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/goods/msg-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/affixs/skuAffixs-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/affixs/goodsAffixs-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/shop/shop-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/sysmsg/sysMsg-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/sysmanager/street/street-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/pc/home-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/helpcenter/helpcenter-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/pc/floor-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/check/check-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/promotion/promotion-sqlmap.xml" />
+	<sqlMap resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/account/account-sqlmap.xml"/>
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/activity/activity-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/goods/shopgoods-sqlmap.xml" />
+	<sqlMap	resource="com/fzjt/xiaoliu/read/interfaces/cfg/ibatis/flashsale/flashsale-sqlmap.xml" />
+	<!-- 推荐模块 -->
+	<sqlMap resource="com/fzjt/xiaoliu/read/interfaces/wanghaodemo/recommend-sqlmap.xml" />
+</sqlMapConfig>

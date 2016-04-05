@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="turnImg">
+
+	<typeAlias alias="RspImgInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.turnImg.bean.rsp.RspImgInfo" />
+	<typeAlias alias="reqImgInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.home.turnImg.bean.req.ReqImgInfo" />
+		
+	<!-- 图片轮转信息 -->
+	<resultMap id="RspImgInfoMap" class="RspImgInfo">
+		<result property="imgKey" column="imgKey"></result>
+		<result property="imgURL" column="imgURL"></result>
+		<result property="linkURL" column="linkURL"></result>
+		<result property="indexNum" column="indexNum"></result>
+	</resultMap>
+	
+	<!-- 查询图片轮转信息 -->
+	<select id="queryImgInfo" parameterClass="reqImgInfo" resultMap="RspImgInfoMap">
+		select t.imgkey  as imgKey,
+				  t.imgurl  as imgURL,
+				  t.linkurl  as linkURL,
+				  t.indexnum  as indexNum
+		from  BASE_APPHOME_TURN_IMG  t
+		where t.PROVINCE = #province#
+		and t.CITY = #city#
+		order by t.indexnum asc
+	</select>
+
+</sqlMap>

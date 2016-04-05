@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="helpcenter">
+	<!-- 客户 customer BEAN -->
+	<typeAlias alias="rspHelpInfo" 
+				type="com.fzjt.xiaoliu.read.interfaces.business.helpcenter.bean.info.rsp.RspHelpInfo"/>
+	<typeAlias alias="reqHelpListInfo" 
+				type="com.fzjt.xiaoliu.read.interfaces.business.helpcenter.bean.list.req.ReqHelpListInfo"/>
+	<typeAlias alias="rspHelpListInfo" 
+				type="com.fzjt.xiaoliu.read.interfaces.business.helpcenter.bean.list.rsp.HelpListInfo"/>
+	<typeAlias alias="helpInfo" 
+				type="com.fzjt.xiaoliu.read.interfaces.business.helpcenter.bean.list.rsp.HelpInfo"/>	
+				
+	
+	<resultMap id="rspHelpInfoMap" class="rspHelpInfo">
+		<result property="title" column="title"></result>
+		<result property="context" column="context"></result>
+	</resultMap>
+	
+	<resultMap id="rspHelpListInfoMap" class="rspHelpListInfo">
+		<result property="hctKey" column="hctKey"></result>
+		<result property="hctName" column="hctName"></result>
+	</resultMap>
+	
+	<resultMap id="helpInfoMap" class="helpInfo">
+		<result property="title" column="title"></result>
+		<result property="dataKey" column="dataKey"></result>
+	</resultMap>
+	
+	
+	<!-- 根据帮助内容key查询帮助信息 -->
+	<select id="queryHelpCenterInfo" parameterClass="java.lang.String" resultMap="rspHelpInfoMap">
+		select  t.TITLE   as title,
+				t.CONTEXT as context
+		from BASE_PC_HELP_CENTER_INFO t
+		where t.DATA_KEY = #dataKey#
+		and t.STATUS = '0'
+		and t.IS_SHOW='0'
+	</select>
+
+	<!-- 查询PC商城帮助中心类别 -->
+	<select id="queryHelpCenterList" parameterClass="reqHelpListInfo" resultMap="rspHelpListInfoMap">
+		select  t.HCT_KEY   as hctKey,
+				t.HCT_NAME  as hctName,
+				row_number() over(order by t.ORDER_FLAG asc)
+		from BASE_PC_HELP_CENTER_TYPE t 
+		where t.PROVINCE = #province#
+		and t.CITY = #city#
+		and t.STATUS = '0'
+	</select>
+	
+	<!-- 根据类别查询datekey和title -->
+	<select id="queryHelpInfoList" parameterClass="java.lang.String" resultMap="helpInfoMap">
+		select  t.TITLE   as title,
+				t.DATA_KEY  as dataKey,
+				row_number() over(order by t.ORDER_FLAG asc)
+		from BASE_PC_HELP_CENTER_INFO t 
+		where t.HCT_KEY = #hctKey#
+		and t.STATUS = '0'
+	</select>
+	
+
+
+
+</sqlMap>

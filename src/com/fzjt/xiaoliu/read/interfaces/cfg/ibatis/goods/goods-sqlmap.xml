@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="goods">
+	<typeAlias alias="ReqGoodsInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.list.req.ReqGoodsInfo" />
+	<typeAlias alias="RspGoodsObjInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.info.rsp.RspGoodsObjInfo" />
+	<typeAlias alias="RspGoodsDetInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.detail.rsp.RspGoodsDetInfo" />
+	<typeAlias alias="RspGoodsListInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.listinfo.rsp.RspGoodsListInfo" />
+	<typeAlias alias="ReqGoodsListInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.listinfo.req.ReqGoodsListInfo" />
+	<typeAlias alias="ReqCollectInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.collect.req.ReqCollectInfo" />
+	<typeAlias alias="RspCollectInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.collect.rsp.RspCollectInfo" />
+	<typeAlias alias="reqRecommendInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.recommend.req.ReqRecommendInfo" />
+	<typeAlias alias="rspRecommendInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.recommend.rsp.RspRecommendInfo" />
+	<typeAlias alias="GoodsKeyInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.goods.bean.info.req.GoodsKeyInfo" />
+
+	<!-- 商品信息 -->
+	<resultMap id="RspGoodsObjInfoMap" class="RspGoodsObjInfo">
+		<result property="ID" column="ID"></result>
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="shopKey" column="shopKey"></result>
+		<result property="goodsName" column="goodsName"></result>
+		<result property="goodsSize" column="goodsSize"></result>
+		<result property="goodsType" column="goodsType"></result>
+		<result property="peisong" column="peisong"></result>
+		<result property="serveInfo" column="serveInfo"></result>
+		<result property="goodsPics" column="goodsPics"></result>
+		<result property="goodsKind" column="goodsKind"></result>
+		<result property="addTime" column="addTime"></result>
+		<result property="uppTime" column="uppTime"></result>
+		<result property="status" column="status"></result>
+		<result property="queryOpts" column="queryOpts"></result>
+		<result property="saleTitle" column="saleTitle"></result>
+		<result property="goodsCount" column="goodsCount"></result>
+		<result property="goodsCode" column="goodsCode"></result>
+		<result property="onSale" column="onSale"></result>
+		<result property="offTime" column="offTime"></result>
+		<result property="onTime" column="onTime"></result>
+		<result property="privilegeInfo" column="privilegeInfo"></result>
+		<result property="limitCount" column="limitCount"></result>
+		<result property="defaultSku" column="defaultSku"></result>
+		<result property="peiSongType" column="peiSongType"></result>
+		<result property="province" column="province"></result>
+		<result property="city" column="city"></result>
+		<result property="area" column="area"></result>
+		<result property="oldPrice" column="oldPrice"></result>
+		<result property="nowPrice" column="nowPrice"></result>
+		<result property="isInvoice" column="isInvoice"></result>
+		<result property="limitDate" column="limitDate"></result>
+	</resultMap>
+
+	<!-- 商品描述 -->
+	<resultMap id="RspGoodsDetInfoMap" class="RspGoodsDetInfo">
+		<result property="goodsDetail" column="goodsDetail" jdbcType="CLOB"
+			javaType="java.lang.String"></result>
+	</resultMap>
+
+	<!-- 商品信息 -->
+	<resultMap id="RspGoodsListInfoMap" class="RspGoodsListInfo">
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="saleTitle" column="saleTitle"></result>
+		<result property="goodsName" column="goodsName"></result>
+		<result property="goodsType" column="goodsType"></result>
+		<result property="goodsPics" column="goodsPics"></result>
+		<result property="goodsKind" column="goodsKind"></result>
+		<result property="goodsCode" column="goodsCode"></result>
+		<result property="oldPrice" column="oldPrice"></result>
+		<result property="nowPrice" column="nowPrice"></result>
+		<result property="indexNum" column="rn" />
+	</resultMap>
+
+	<!-- 收藏信息 -->
+	<resultMap id="RspCollectInfoMap" class="RspCollectInfo">
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="goodsName" column="goodsName"></result>
+		<result property="goodsPic" column="goodsPic"></result>
+		<result property="priceOld" column="priceOld"></result>
+		<result property="priceNow" column="priceNow"></result>
+		<result property="saleTitle" column="saleTitle"></result>
+		<result property="onSale" column="onSale"></result>
+		<result property="indexNum" column="rn" />
+		<result property="status" column="status"/>
+	</resultMap>
+
+	<!-- 查询推荐商品列表 -->
+	<resultMap id="rspRecommendInfoMap" class="rspRecommendInfo">
+		<result property="goodsKey" column="goodsKey"></result>
+		<result property="shopKey" column="shopKey"></result>
+		<result property="goodsName" column="goodsName"></result>
+		<result property="goodsType" column="goodsType"></result>
+		<result property="priceOld" column="priceOld"></result>
+		<result property="priceNow" column="priceNow"></result>
+		<result property="goodsSize" column="goodsSize"></result>
+		<result property="peiSong" column="peiSong"></result>
+		<result property="serveInfo" column="serveInfo"></result>
+		<result property="goodsPics" column="goodsPics"></result>
+		<result property="goodsKind" column="goodsKind"></result>
+		<result property="goodsDetail" column="goodsDetail"></result>
+		<result property="saleTitle" column="saleTitle"></result>
+		<result property="saleNum" column="saleNum"></result>
+	</resultMap>
+
+	<!-- 根据商品goodskey查询商品信息 -->
+	<select id="queryGoodsByGoodsKey" parameterClass="java.lang.String"
+		resultMap="RspGoodsObjInfoMap">
+		select t.goods_id as ID,
+		t.goods_key as goodsKey,
+		t.shop_key
+		as shopKey,
+		t.goods_name as goodsName,
+		t.goods_type as goodsType,
+		t.goods_size as goodsSize,
+		t.peisong as peisong,
+		t.serve_info as	serveInfo,
+		t.goods_pics as goodsPics,
+		t.goods_kind as goodsKind,
+		t.add_time as addTime,
+		t.upp_time as uppTime,
+		t.status as status,
+		t.query_opts as queryOpts,
+		t.sale_title as saleTitle,
+		t.goods_count as goodsCount,
+		t.goods_code as goodsCode,
+		t.on_sale as onSale,
+		t.off_time as offTime,
+		t.on_time as onTime,
+		t.privilege_info as privilegeInfo,
+		t.limit_count as limitCount,
+		t.DEFAULT_SKU as defaultSku,
+		t.PEISONG_TYPE as peiSongType,
+		 t.province_code as province,
+    	t.city_code as city,
+    	t.area_code as area,
+    	trim(to_char(t.price_old/100,'999999999999990.99'))	as oldPrice,
+		trim(to_char(t.price_now/100,'999999999999990.99'))	as nowPrice,
+		t.LIMIT_DATE as limitDate,
+		t.IS_INVOICE as isInvoice
+		from base_shop_goods_info t
+		where
+		t.goods_key = #goodsKey#
+	</select>
+
+	<!-- 根据用户查询商品信息插入浏览记录 -->
+	<insert id="addHistoryInfo" parameterClass="GoodsKeyInfo">
+		insert into
+		BASE_SHOP_VISIT_HISTORY t
+		(
+		t.id,
+		t.userkey,
+		t.goods_key,
+		t.type_key,
+		t.add_time,
+		t.status,
+		t.v_key,
+		t.PROVINCE,
+		t.CITY,
+		t.AREA
+		)
+		values
+		(
+		SEQ_BASE_SHOP_VISIT_HISTORY.nextval,
+		#userKey#,
+		#goodsKey#,
+		#typeKey#,
+		sysdate,
+		0,
+		#vKey#,
+		#province#,
+		#city#,
+		#area#
+		)
+	</insert>
+
+	<!-- 根据商品goodskey查询商品详情 -->
+	<select id="queryGoodsDetByGoodsKey" parameterClass="java.lang.String"
+		resultMap="RspGoodsDetInfoMap">
+		select t.goods_detail as goodsDetail
+		from
+		base_shop_goods_info t
+		where t.goods_key = #goodsKey#
+	</select>
+
+	<!-- 根据商品的排序方式销量、类别、名称查询商品列表 -->
+	<select id="queryGoodsListBySaleNum" parameterClass="ReqGoodsListInfo"
+		resultMap="RspGoodsListInfoMap">
+		select goodsKey ,
+		saleTitle ,
+		goodsName ,
+		goodsType,
+		goodsPics,
+		goodsKind,
+		goodsCode,
+		trim(to_char(oldPrice/100,'999999999999990.99'))	as oldPrice,
+		trim(to_char(nowPrice/100,'999999999999990.99'))	as nowPrice,
+		rn
+		from (select *
+		from (select * from(select
+		t.goods_key as goodsKey,
+		t.sale_title as saleTitle,
+		t.goods_name as
+		goodsName,
+		t.goods_type as goodsType,
+		t.goods_pics as goodsPics,
+		t.goods_kind as goodsKind,
+		t.goods_code as goodsCode,
+		t.PRICE_OLD  as	oldPrice,
+		t.PRICE_NOW  as nowPrice,
+		row_number() over(order by
+		f_shop_goods_sale_num(t.goods_key) $sort$) rn
+		from base_shop_goods_info
+		t
+		where t.status = '0'
+		and t.ON_SALE = '0'
+		and t.PROVINCE_CODE = #province#
+		and t.CITY_CODE = #city#
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.goods_name like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsType">
+			t.goods_type =
+			#goodsType#
+		</isNotEmpty>
+		)
+	    	     <![CDATA[	
+	    	     where rn >= #fromNum#	
+			        )
+						where rn <= #toNum#
+			     ]]>
+		)
+	</select>
+
+	<!-- 根据商品的排序方式价格、类别、名称查询商品列表 -->
+	<select id="queryGoodsListByPrice" parameterClass="ReqGoodsListInfo"
+		resultMap="RspGoodsListInfoMap">
+		select goodsKey ,
+		saleTitle ,
+		goodsName ,
+		goodsType,
+		goodsPics,
+		goodsKind,
+		goodsCode,
+		trim(to_char(oldPrice/100,'999999999999990.99'))	as oldPrice,
+		trim(to_char(nowPrice/100,'999999999999990.99'))	as nowPrice,
+		rn
+		from (select *
+		from (select * from(select
+		t.goods_key as goodsKey,
+		t.sale_title as saleTitle,
+		t.goods_name as
+		goodsName,
+		t.goods_type as goodsType,
+		t.goods_pics as goodsPics,
+		t.goods_kind as goodsKind,
+		t.goods_code as goodsCode,
+		t.PRICE_OLD  as oldPrice,
+		t.PRICE_NOW  as nowPrice,
+		row_number() over(order by	t.PRICE_NOW $sort$) rn
+		from base_shop_goods_info t
+		where t.status = '0'
+		and t.ON_SALE = '0'
+		and t.PROVINCE_CODE = #province#
+		and t.CITY_CODE = #city#
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.goods_name like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsType">
+			t.goods_type =
+			#goodsType#
+		</isNotEmpty>
+		)
+	    	     <![CDATA[	
+	    	     where rn >= #fromNum#	
+			        )
+						where rn <= #toNum#
+			     ]]>
+		)
+	</select>
+
+	<!-- 根据商品的排序方式上架时间、类别、名称查询商品列表 -->
+	<select id="queryGoodsListByOnTime" parameterClass="ReqGoodsListInfo"
+		resultMap="RspGoodsListInfoMap">
+		select goodsKey ,
+		saleTitle ,
+		goodsName ,
+		goodsType,
+		goodsPics,
+		goodsKind,
+		goodsCode,
+		trim(to_char(oldPrice/100,'999999999999990.99'))	as oldPrice,
+		trim(to_char(nowPrice/100,'999999999999990.99'))	as nowPrice,
+		rn
+		from (select *
+		from (select * from(select
+		t.goods_key as goodsKey,
+		t.sale_title as saleTitle,
+		t.goods_name as	goodsName,
+		t.goods_type as goodsType,
+		t.goods_pics as goodsPics,
+		t.goods_kind as goodsKind,
+		t.goods_code as goodsCode,
+		t.PRICE_OLD  as oldPrice,
+		t.PRICE_NOW  as nowPrice,
+		row_number() over(order by t.on_time $sort$) rn
+		from base_shop_goods_info t
+		where t.status = '0'
+		and t.ON_SALE = '0'
+		and t.PROVINCE_CODE = #province#
+		and t.CITY_CODE = #city#
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.goods_name like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsType">
+			t.goods_type =
+			#goodsType#
+		</isNotEmpty>
+		) s
+	    	     <![CDATA[	
+	    	     where rn >= #fromNum#	
+			        )
+						where rn <= #toNum#
+			     ]]>
+		)
+	</select>
+
+	<!-- 查询商品条数 -->
+	<select id="queryGoodsListCount" parameterClass="ReqGoodsListInfo"
+		resultClass="java.lang.String">
+		select count(t.GOODS_KEY)
+		from base_shop_goods_info t
+		where t.status = '0'
+		and
+		t.ON_SALE = '0'
+		and t.PROVINCE_CODE = #province#
+		and t.CITY_CODE = #city#
+		<isNotEmpty prepend=" AND " property="goodsName">
+			t.goods_name like '%$goodsName$%' escape '\'
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsType">
+			t.goods_type = #goodsType#
+		</isNotEmpty>
+	</select>
+
+	<!-- 根据商品收藏列表 -->
+	<select id="queryUserCollectList" parameterClass="ReqCollectInfo"	resultMap="RspCollectInfoMap">
+		select  *
+		from (select  goodsKey,
+			    goodsName,
+			    goodsPic,
+			    trim(to_char(s.PRICE_OLD/100,'999999999999990.99')) as priceOld,
+			    trim(to_char(s.PRICE_NOW/100,'999999999999990.99')) as priceNow,
+			    s.SALE_TITLE as saleTitle,
+			    s.ON_SALE as onSale,
+			    s.STATUS as status,
+			    row_number() over(order by addTime desc) rn	
+			     		from (select t.GOODS_KEY as goodsKey,
+						            t.GOODS_NAME as goodsName,
+						            t.GOODS_PIC as goodsPic,
+						            t.add_time as addTime
+						            from BASE_SHOP_GOODS_COLLECT t
+						            where t.status = '0'
+						            and t.USER_KEY = #userKey#
+									<isNotEmpty prepend=" AND " property="typeKey">
+										t.TYPE_KEY = #typeKey#
+									</isNotEmpty>  ) t,
+					base_shop_goods_info s
+					where t.goodsKey = s.GOODS_KEY(+)
+					and s.STATUS != '1'
+					)
+					where rn between #fromNum# and #toNum#
+	</select>
+
+	<!-- 查询收藏商品条数 -->
+	<select id="queryGoodsCollectCount" parameterClass="ReqCollectInfo"
+		resultClass="java.lang.String">
+		select count(t.COLLECT_KEY)
+		from BASE_SHOP_GOODS_COLLECT t,
+		BASE_SHOP_GOODS_INFO s
+		where t.status = '0'
+		and t.GOODS_KEY = s.GOODS_KEY(+)
+		and s.STATUS != '1'
+		and t.USER_KEY = #userKey#
+		<isNotEmpty prepend=" AND " property="typeKey">
+			t.TYPE_KEY = #typeKey#
+		</isNotEmpty>
+	</select>
+
+	<!-- 根据userkey 查询用户最近浏览的商品类别，“，”分割 -->
+	<select id="queryUserVisitGoodsType" parameterClass="reqRecommendInfo"
+		resultClass="java.lang.String">
+		select listagg(t.type_key, ',') within group(order by t.typenum desc)
+		from (select t.type_key, count(1) typenum
+		from (select t.*
+		from (select
+		t.*,
+		row_number() over(order by add_time desc) rn
+		from
+		BASE_SHOP_VISIT_HISTORY t
+		where t.userkey = #userKey#
+		and t.status ='0'
+		and t.PROVINCE = #province#
+		and t.CITY = #city#
+		) t
+           <![CDATA[
+                   where rn <= #searchRange#) t
+           ]]>
+		group by t.type_key) t
+	</select>
+
+	<!-- 猜你喜欢，查询推荐商品列表 -->
+	<select id="queryRecommendGoods" parameterClass="reqRecommendInfo"
+		resultMap="rspRecommendInfoMap">
+		select goodsKey as goodsKey,
+		shopKey as shopKey,
+		goodsName as goodsName,
+		goodsType as goodsType,
+		goodsSize as goodsSize,
+		peiSong as peiSong,
+		serveInfo as serveInfo,
+		goodsPics as goodsPics,
+		goodsKind as goodsKind,
+		goodsDetail as goodsDetail,
+		saleTitle as saleTitle,
+		trim(to_char(priceOld/100,'999999999999990.99')) as	priceOld,
+		trim(to_char(priceNow/100,'999999999999990.99')) as priceNow,
+		f_shop_goods_sale_num(goodsKey) as
+		saleNum,
+		rn as rn
+		from (select *
+		from (select * from(select t.goods_key
+		as goodsKey,
+		t.shop_key as shopKey,
+		t.goods_name as goodsName,
+		t.goods_type as goodsType,
+		t.goods_size as goodsSize,
+		t.peisong as peiSong,
+		t.serve_info as serveInfo,
+		t.goods_pics as goodsPics,
+		t.goods_kind as goodsKind,
+		t.goods_detail as goodsDetail,
+		t.sale_title as saleTitle,
+		t.PRICE_OLD as priceOld,
+		t.PRICE_NOW as priceNow,
+		row_number() over(order by f_shop_goods_sale_num(t.goods_key) asc) rn
+		from base_shop_goods_info t
+		where t.status = '0'
+		and t.on_sale = '0'
+		and t.province_code = #province#
+		and t.city_code = #city#
+		<isNotEmpty prepend=" AND " property="goodsType">
+			t.goods_type = #goodsType#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="goodsKey">
+			t.goods_key != #goodsKey#
+		</isNotEmpty>
+		)
+	    	     <![CDATA[	
+	    	     where rn >= 0		
+			        )
+						where rn <= #count#
+			     ]]>
+		)
+	</select>
+	
+	<!-- 搜索记录是否存在 -->
+	<select id="countSearchHistory" parameterClass="ReqGoodsListInfo" resultClass="java.lang.String">
+		select count(t.ID) 
+		from BASE_BUSINESS_SEARCH_HISTORY t
+		where t.USER_KEY = #userKey#
+		and t.SEARCH_INFO = #goodsName#
+	</select>
+	
+	<!-- 更新已存在搜索记录更新时间 -->
+	<update id="updateSearchTime" parameterClass="ReqGoodsListInfo">
+	update BASE_BUSINESS_SEARCH_HISTORY  t
+	set t.ADD_TIME = sysdate
+	where t.USER_KEY = #userKey#
+	and t.SEARCH_INFO = #goodsName#
+	</update>
+	
+	<!-- 根据用户搜索信息插入搜索记录 -->
+	<insert id="addSearchHistory" parameterClass="ReqGoodsListInfo">
+		insert into
+		BASE_BUSINESS_SEARCH_HISTORY t
+		(
+		t.ID,
+		t.USER_KEY,
+		t.SEARCH_INFO,
+		t.ADD_TIME,
+		t.STATUS
+		)
+		values
+		(
+		SEQ_BUSINESS_SEARCH_HISTORY.nextval,
+		#userKey#,
+		#goodsName#,
+		sysdate,
+		0
+		)
+	</insert>
+
+</sqlMap>

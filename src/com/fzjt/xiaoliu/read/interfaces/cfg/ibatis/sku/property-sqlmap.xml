@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+		"http://www.ibatis.com/dtd/ibatis-2-config.dtd">
+<sqlMap namespace="property">
+
+<typeAlias alias="RspPropertyInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.property.rsp.RspPropertyInfo" />
+<typeAlias alias="RspValueInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.value.rsp.RspValueInfo" />
+<typeAlias alias="reqValueInfo"
+		type="com.fzjt.xiaoliu.read.interfaces.business.sku.bean.value.req.ReqValueInfo" />
+		
+	<!-- 商品特征量信息 -->
+	<resultMap id="RspPropertyInfoMap" class="RspPropertyInfo">
+		<result property="pKey" column="pKey"></result>
+		<result property="pName" column="pName"></result>
+		<result property="orderFlag" column="orderFlag"></result>
+	</resultMap>
+	
+	<!-- 商品特征值信息 -->
+	<resultMap id="RspValueInfoMap" class="RspValueInfo">
+		<result property="ID" column="ID"></result>
+		<result property="vKey" column="vKey"></result>
+		<result property="vName" column="vName"></result>
+		<result property="status" column="status"></result>
+		<result property="orderFlag" column="orderFlag"></result>
+		<result property="vPic" column="vPic"></result>
+	</resultMap>
+
+	
+	<!-- 根据商品类别查询商品特征量 -->
+	<select id="queryPropertyByTypeKey" parameterClass="java.lang.String" resultMap="RspPropertyInfoMap">
+		select  t.id 			as ID,
+					t.P_KEY   		as pKey,
+					t.P_NAME 		as pName,
+					t.STATUS		as status,
+					t.ORDER_FLAG 	as orderFlag
+		from 	BASE_SHOP_GOODS_PROPERTY_SALE t
+		where 	t.TYPE_KEY = #typeKey#
+		and t.STATUS = '0'
+	</select>
+	
+	<!-- 根据商品 特征量查询商品特征值信息 -->
+	<select id="queryValueByPropertyKey" parameterClass="reqValueInfo" resultMap="RspValueInfoMap">
+						select  t.id 			as ID,
+								t.V_KEY   		as vKey,
+								t.V_NAME 		as vName,
+								t.STATUS		as status,
+								t.ORDER_FLAG 	as orderFlag,
+								t.V_PIC			as vPic
+						from 	BASE_SHOP_GOODS_VALUE_SALE t
+						where  t.P_KEY = #pKey#
+						and	t.STATUS = '0'	
+						<isNotEmpty prepend=" AND " property="goodsKey">
+						  exists (select s.V_KEY from BASE_SHOP_GOODS_SKU_RELATION s 
+						  where s.GOODS_KEY = #goodsKey#
+			              and s.STATUS = '0'
+			              and s.V_KEY = t.V_KEY)
+			            </isNotEmpty>
+			            order by orderFlag asc
+	</select>
+	
+	<!-- 根据商品goodskey查询商品特征量 -->
+	<select id="queryPListByGoodsKey" parameterClass="java.lang.String" resultMap="RspPropertyInfoMap">
+		select distinct t.P_KEY      as pKey,
+		                s.P_NAME     as pName,
+		                s.ORDER_FLAG as orderFlag
+		  from BASE_SHOP_GOODS_SKU_RELATION t, BASE_SHOP_GOODS_PROPERTY_SALE s
+		 where t.P_KEY = s.P_KEY
+		   and t.GOODS_KEY = #goodsKey#
+		   and t.STATUS = '0'
+		   and s.STATUS = '0'
+		 order by orderFlag asc
+	</select>
+</sqlMap>

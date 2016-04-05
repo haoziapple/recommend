@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context  
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName">
+
+	<context:component-scan base-package="com.fzjt" />
+	<context:annotation-config />
+	<bean id="typeDAO"
+		class="com.fzjt.xiaoliu.read.interfaces.business.goods.type.dao.impl.TypeDAOImpl">
+		<property name="dataSource" ref="dataSource" />
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+	<!--注入DAO  -->
+	<bean id="typeService"
+		class="com.fzjt.xiaoliu.read.interfaces.business.goods.type.service.impl.TypeServiceImpl">
+		<property name="typeDAO" ref="typeDAO" />
+	</bean>
+</beans>
